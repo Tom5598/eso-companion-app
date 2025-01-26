@@ -12,16 +12,11 @@ export class AuthService {
     private firestore: AngularFirestore
   ) {}
 
-  /**
-   * Register a new user with email and password.
-   * Also create a user profile document in Firestore.
-   */
   register(email: string, password: string, username: string): Observable<any> {
     return from(
       this.afAuth
         .createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
-          // If the user is created, save additional user data in Firestore
           if (userCredential.user) {
             const uid = userCredential.user.uid;
             const userData: User = {
@@ -39,23 +34,13 @@ export class AuthService {
     );
   }
 
-  /**
-   * Log in user with email and password.
-   */
   login(email: string, password: string): Observable<any> {
     return from(this.afAuth.signInWithEmailAndPassword(email, password));
   }
-
-  /**
-   * Log out the current user.
-   */
   logout(): Observable<void> {
     return from(this.afAuth.signOut());
   }
 
-  /**
-   * Returns an observable with the current user.
-   */
   getCurrentUser(): Observable<any> {
     return this.afAuth.authState;
   }
