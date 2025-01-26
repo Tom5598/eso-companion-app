@@ -1,0 +1,23 @@
+.register-container {
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 1rem;
+  
+    h2 {
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+  
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+  
+    .error {
+      color: #d32f2f;
+      margin-top: 1rem;
+      text-align: center;
+    }
+  }
+  

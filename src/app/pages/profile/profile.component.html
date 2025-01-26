@@ -1,0 +1,33 @@
+<mat-card class="profile-container">
+  <h2>My Profile</h2>
+
+  <div class="profile-pic-wrapper">
+    <img
+      [src]="userData?.photoURL ? userData.photoURL : defaultPicUrl"
+      alt="Profile Picture"
+      class="profile-pic"
+    />
+    <button
+      mat-fab
+      color="accent"
+      class="edit-btn"
+      (click)="onSelectProfilePic()"
+      aria-label="Edit Profile Picture"
+    >
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+  <!-- Hidden file input -->
+  <input
+    #fileInput
+    type="file"
+    accept="image/png, image/jpeg"
+    style="display: none"
+    (change)="onFileSelected($event)"
+  />
+
+  <div *ngIf="userData">
+    <p><strong>Email:</strong> {{ user?.email }}</p>
+    <p><strong>Username:</strong> {{ userData.username }}</p>
+  </div>
+</mat-card>

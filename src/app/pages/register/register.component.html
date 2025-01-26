@@ -1,0 +1,42 @@
+<mat-card class="register-container">
+  <h2>Register</h2>
+  <form (ngSubmit)="onRegister()" #registerForm="ngForm">
+    <mat-form-field appearance="fill">
+      <mat-label>Username</mat-label>
+      <input
+        matInput
+        type="text"
+        required
+        [(ngModel)]="username"
+        name="username"
+      />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" required [(ngModel)]="email" name="email" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Password</mat-label>
+      <input
+        matInput
+        type="password"
+        required
+        [(ngModel)]="password"
+        name="password"
+      />
+    </mat-form-field>
+
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="registerForm.invalid"
+    >
+      Register
+    </button>
+  </form>
+
+  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+</mat-card>
