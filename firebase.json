@@ -20,7 +20,7 @@
     }
   ],
   "hosting": {
-    "public": "dist/eso-companion-app/browser",
+    "source": ".",
     "ignore": [
       "firebase.json",
       "**/.*",
