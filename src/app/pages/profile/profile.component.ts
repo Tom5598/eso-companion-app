@@ -6,7 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 // RxJS
-import { Subscription, switchMap, finalize } from 'rxjs';
+import { Subscription, switchMap, finalize, Observable } from 'rxjs';
 
 import { AuthService } from '../../services/auth.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
@@ -26,6 +26,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private userDocSub!: Subscription;
   defaultPicUrl = '';
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+  
   constructor(
     private authService: AuthService,
     private firestore: AngularFirestore,
@@ -60,6 +61,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
   onSelectProfilePic() {
     // This triggers the hidden file input
     this.fileInputRef.nativeElement.click();
+    
+   
+  
   }
 
   async onFileSelected(event: Event) {

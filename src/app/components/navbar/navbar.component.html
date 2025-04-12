@@ -6,7 +6,9 @@
   <button mat-button routerLink="/forum">
     <mat-icon>forum</mat-icon> Forum
   </button>
-
+  <button mat-button routerLink="/tmp">
+    <mat-icon>hourglass_empty</mat-icon> TMP
+  </button>
   <!-- If NOT logged in, show login/register -->
   <button mat-button routerLink="/login" *ngIf="!isLoggedIn">
     <mat-icon>login</mat-icon> Login
