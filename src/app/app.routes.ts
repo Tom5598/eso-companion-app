@@ -6,11 +6,19 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { AuthGuard } from './guards/auth.guard';
 import { HomeComponent } from './pages/home/home.component';
 import { TmpComponent } from './pages/tmp/tmp.component'; // Temporary component for testing
+import { PostCreateComponent } from './pages/forum/post-create/post-create.component';
+import { PostEditComponent } from './pages/forum/post-edit/post-edit.component';
+import { PostDetailComponent } from './pages/forum/post-detail/post-detail.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
     { path: 'forum', component: ForumComponent },
+    { path: 'forum/post-edit/:id',component: PostEditComponent },
+    { path : 'forum/post-create', component: PostCreateComponent},
+    
+    { path: 'forum/:id', component :PostDetailComponent },
+    
     { path: 'home', component: HomeComponent },
     { path: 'tmp', component: TmpComponent },
     { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },

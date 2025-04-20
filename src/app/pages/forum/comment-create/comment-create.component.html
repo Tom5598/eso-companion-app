@@ -1,0 +1,22 @@
+<div class="sheet">
+    <h3>New Comment</h3>
+    <textarea
+      matInput
+      placeholder="Write your comment..."
+      [formControl]="form.controls.content"
+      rows="4"
+    ></textarea>
+  
+    <div class="actions">
+      <button mat-button (click)="cancel()">Cancel</button>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="post()"
+        [disabled]="form.invalid"
+      >
+        Post
+      </button>
+    </div>
+  </div>
+  

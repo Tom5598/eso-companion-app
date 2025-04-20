@@ -36,7 +36,9 @@ yarn-error.log
 /libpeerconnection.log
 testem.log
 /typings
-/src/app/env/environment.ts
+/src/app/env/*
 # System files
 .DS_Store
 Thumbs.db
+# Test files
+/test_data

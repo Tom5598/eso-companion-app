@@ -29,31 +29,40 @@ import {
   throttle,
 } from 'rxjs';
 import { debug, RxJsLoggingLevel } from '../../util/debug';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-tmp',
   standalone: true,
-  imports: [AsyncPipe],
+  imports: [AsyncPipe, MatButton],
   templateUrl: './tmp.component.html',
   styleUrl: './tmp.component.scss',
 })
 export class TmpComponent implements OnInit, OnDestroy, AfterViewInit {
+  comment$: Observable<any> = new Observable<any>();
   articles$: Observable<any> = new Observable<any>();
   @ViewChild('search')
   input: ElementRef = new ElementRef('');
   ref: Subscription = new Subscription();
   constructor(private firestore: AngularFirestore) {}
-
-  ngOnDestroy(): void {}
+  snapRef: Subscription = new Subscription();
+  ngOnDestroy(): void {
+    this.snapRef.unsubscribe();
+    this.ref.unsubscribe();
+  }
 
   ngOnInit(): void {
-    
-    const subject = new Subject();
-    subject.pipe(
+    this.firestore.doc("testCollection/myData")
+    .get()
+      .subscribe((snap)=>{
+        console.log(snap.data());
+        
 
-    );
+      });
+    
 
   }
+
   ngAfterViewInit(): void {
     this.ref = fromEvent(this.input.nativeElement, 'keyup')
       .pipe(
@@ -64,6 +73,44 @@ export class TmpComponent implements OnInit, OnDestroy, AfterViewInit {
       )
       .subscribe(console.log);
   }
+
+  readDoc() {
+    this.articles$ = this.firestore.doc('testCollection/myData').get().pipe(
+      map((data: any) => {               
+        console.log(Object.values(data.data()));        
+        return Object.values(data.data());
+      }
+    ));
+  }
+  readDocSnapshot() {
+    this.snapRef = this.firestore.doc('testCollection/myData').snapshotChanges().subscribe((snap)=>{
+      console.log("Snapshot type: ",snap.type);
+      console.log("Snapshot payload",snap.payload.data());
+      
+      
+    });
+  }
+  readCollection() {
+     this.firestore.collection('forum/H2fzYlJssbQDcAHTX88v/comments' // filter by postId
+     ).get()
+      .subscribe((snaps)=>{
+        snaps.forEach((snap)=>{
+          console.log(snap.data());
+        });
+      });
+  }
+  readCollectionGroup(){
+    this.firestore.collectionGroup('comments', ref => ref.where("author","==", "NewGuy131")
+    ).get()
+      .subscribe((snaps)=>{
+        snaps.forEach((snap)=>{
+          console.log(snap.data());
+        });
+      });
+  }
+
+
+
 }
 /**
       this.articles$ = this.firestore.doc('testCollection/myData').valueChanges().pipe(

@@ -1,1 +1,57 @@
-<p>forum works!</p>
+<mat-sidenav-container class="fill">
+  <!-- FILTERS -->
+  <mat-sidenav mode="side" opened class="filters" disableClose>
+    <h3 class="p-2">Filters</h3>
+    <!-- (later) -->
+  </mat-sidenav>
+
+  <!-- POSTS -->
+  <mat-sidenav-content class="content">
+    <div class="posts" *ngIf="posts$ | async as posts">
+      <mat-card
+        *ngFor="let post of posts"
+        class="post-card"
+        [routerLink]="['/forum', post.id]"
+      >
+        <mat-card-title>{{ post.title }}</mat-card-title>
+        <mat-card-subtitle>
+          by {{ post.username }} ·
+          {{ post.createdAt | toDate | date : "short" }}
+        </mat-card-subtitle>
+        <mat-card-content>
+          <p class="truncate">{{ post.content }}</p>          
+          <mat-chip-set class="hashtags" *ngIf="post.hashtags?.length">
+            <mat-chip *ngFor="let tag of post.hashtags" > #{{ tag }} </mat-chip>
+          </mat-chip-set>
+        </mat-card-content>
+        <mat-card-actions>
+          <span>
+            <mat-icon color="primary" matTooltip="Comments" [matTooltipPosition]="'above'"
+            matTooltipHideDelay="100">comment</mat-icon>{{ post.commentCount }} 
+          </span>
+          
+          <span class="likeIcon" > 
+            <mat-icon color="warn" matTooltip="Likes"
+            [matTooltipPosition]="'above'"
+            matTooltipHideDelay="100">favorite</mat-icon>
+            {{ post.likeCount }}
+          </span>
+          
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <!-- FAB visible only if logged in -->
+    @if (auth.fbUser$|async) {
+    <button
+      mat-fab
+      color="accent"
+      aria-label="New post"
+      class="fab"
+      routerLink="/forum/post-create"
+    >
+      <mat-icon>add</mat-icon>
+    </button>
+    }
+  </mat-sidenav-content>
+</mat-sidenav-container>

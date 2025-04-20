@@ -1,0 +1,85 @@
+<form [formGroup]="form" (ngSubmit)="savePost()" class="form">
+  <h2>Create new post</h2>
+  <mat-form-field appearance="fill" class="w-100">
+    <mat-label>Title</mat-label>
+    <input matInput formControlName="title" />
+    @if (form.get('title')?.hasError('required')) {
+    <mat-error>Title is required!</mat-error>
+    } @if (form.get('title')?.hasError('minlength')) {
+    <mat-error> Title is too short!</mat-error>
+    } @if (form.get('title')?.hasError('maxlength')) {
+    <mat-error> Title is too long!</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="w-100">
+    <mat-label>Content</mat-label>
+    <textarea matInput rows="8" formControlName="content"></textarea>
+    @if (form.get('content')?.hasError('required')) {
+    <mat-error>Content is required!</mat-error>
+    } @if (form.get('content')?.hasError('minlength')) {
+    <mat-error> Content is too short!</mat-error>
+    } @if (form.get('content')?.hasError('maxlength')) {
+    <mat-error> Content is too long!</mat-error>
+    }
+  </mat-form-field>
+  <!-- Hashtag picker -->
+  <mat-label>Available tags:</mat-label>
+  <mat-chip-listbox aria-label="Tag selection" multiple>
+    <mat-chip-option
+      *ngFor="let tag of tags$ | async"
+      [value]="tag"
+      [selected]="form.value.hashtags?.includes(tag)"
+      (selectionChange)="toggleTag(tag)"
+    >
+      {{ tag }}
+    </mat-chip-option>
+  </mat-chip-listbox>
+
+  <br />
+  <br />
+  <!-- image picker -->
+  <input
+    type="file"
+    accept="image/png,image/jpeg"
+    multiple
+    hidden
+    #fileInput
+    (change)="onFileSelect($event)"
+  />
+  <button
+    mat-stroked-button
+    color="primary"
+    type="button"
+    (click)="fileInput.click()"
+    [disabled]="files.length >= 10"
+  >
+    <mat-icon>photo_camera</mat-icon> Add images ({{ files.length }}/10)
+  </button>
+
+  <!-- thumbnails -->
+  <div class="thumbs">
+    <mat-card *ngFor="let p of previews; index as i" class="thumb">
+      <img [src]="p" />
+      <button mat-icon-button class="remove" (click)="remove(i)">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-card>
+  </div>
+
+  <!-- progress -->
+  <mat-progress-bar
+    *ngIf="uploading"
+    mode="determinate"
+    [value]="uploadProgress"
+  ></mat-progress-bar>
+
+  <button
+    mat-raised-button
+    color="primary"
+    type="submit"
+    [disabled]="form.invalid || uploading"
+  >
+    Publish
+  </button>
+</form>

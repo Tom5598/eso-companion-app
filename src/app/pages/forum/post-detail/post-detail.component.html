@@ -1,0 +1,61 @@
+<ng-container *ngIf="post$ | async as post">
+    <mat-card class="post-card">
+      <!-- Title -->
+      <mat-card-title>{{ post.title }}</mat-card-title>  
+      <!-- Meta: author + dates -->
+      <mat-card-subtitle>
+        by {{ post.username }}
+        • {{ post.createdAt | toDate | date:'short' }}
+        @if (post.isEdited) {
+            <ng-container >
+              • (edited: {{ post.updatedAt| toDate |date:'short' }})
+            </ng-container>
+        }        
+      </mat-card-subtitle>
+  
+      <!-- Content -->
+      <mat-card-content>
+        <p>{{ post.content }}</p>
+      </mat-card-content>
+  
+      <!-- Linked pictures -->
+      <div class="pictures" *ngIf="post.linkedPictures?.length">
+        <img 
+          *ngFor="let url of post.linkedPictures" 
+          [src]="url" 
+          class="linked-pic" />
+      </div>
+      <br /> 
+      <div>
+        <mat-chip-set class="hashtags" *ngIf="post.hashtags?.length">
+          <mat-chip *ngFor="let tag of post.hashtags" > #{{ tag }} </mat-chip>
+        </mat-chip-set>
+      </div>
+      <!-- Actions -->
+      <mat-card-actions>
+        <button mat-button [disabled]="post.isLocked" color="warn" matTooltip="Toggles the like on this post."
+        [matTooltipPosition]="'above'"
+        matTooltipHideDelay="200"
+          (click)="toggleLike()">{{post.likeCount}}<mat-icon>{{(isLiked$ | async) ? 'favorite' : 'favorite_border'}}</mat-icon>
+         
+        </button>        
+        <button mat-button [disabled]="post.isLocked" (click)="openComment()" color="primary">Comment</button>
+        <button mat-button [disabled]="post.isLocked" (click)="share()" color="accent">Share</button>
+        {{currentUserId$.iud}}
+        @if (post.authorId == currentUserId$?.uid) {
+            <button mat-button [disabled]="post.isLocked" (click)="openEditPost(post)" >Edit</button>      
+        }       
+      </mat-card-actions>
+    </mat-card>  
+    <!-- Comments List -->
+    <div class="comments" *ngIf="comments$ | async as comments">
+      <mat-card class="comment" *ngFor="let c of comments">
+        <mat-card-subtitle>
+          {{ c.username }}  {{ c.createdAt | toDate | date:'short' }}
+        </mat-card-subtitle>
+        <mat-card-content>{{ c.content }}</mat-card-content>
+      </mat-card>
+      
+    </div>
+  </ng-container>
+  

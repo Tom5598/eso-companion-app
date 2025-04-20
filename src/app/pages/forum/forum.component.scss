@@ -1,0 +1,38 @@
+.fill {
+    height: 100vh;
+  }
+  .filters {
+    width: 260px;
+  }
+  .content {
+    padding: 1rem;
+    position: relative;
+  }
+  .posts {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 800px;
+  }
+  .post-card {
+    cursor: pointer;
+  }
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+  .fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+  }
+  mat-icon{
+    margin-bottom: -5px;
+  }
+  .likeIcon{
+    padding-left: 50px;
+  }
