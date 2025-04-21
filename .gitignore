@@ -42,3 +42,4 @@ testem.log
 Thumbs.db
 # Test files
 /test_data
+src/app/helpers

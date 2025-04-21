@@ -1,5 +1,4 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { v4 as uuid } from 'uuid';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -7,8 +6,7 @@ import {
   Validators,
   FormControl,
 } from '@angular/forms';
-import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule, MatHint } from '@angular/material/form-field';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { ForumService } from '../../../services/forum.service';
@@ -31,18 +29,17 @@ import {
   throwError,
 } from 'rxjs';
 import { Router } from '@angular/router';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Post } from '../../../models/post.model';
-import { Timestamp, FieldValue } from 'firebase/firestore';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
-import { AngularFireFunctions } from '@angular/fire/compat/functions';
-import { MatChipsModule }   from '@angular/material/chips';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { CommodityService } from '../../../services/commodity.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
 @Component({
   selector: 'app-post-create',
   standalone: true,
@@ -54,31 +51,42 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatButtonModule,
     MatCardModule,
     MatIconModule,
-    MatProgressBarModule,MatChipsModule,MatTooltipModule,
+    MatProgressBarModule,
+    MatChipsModule,
+    MatTooltipModule,
   ],
   templateUrl: './post-create.component.html',
   styleUrls: ['./post-create.component.scss'],
 })
 export class PostCreateComponent implements OnInit {
-  
-
   private fb = inject(FormBuilder);
-  private storage = inject(AngularFireStorage);
   private forumService = inject(ForumService);
   private afs = inject(AngularFirestore);
   private auth = inject(AuthService);
   private router = inject(Router);
-  private fns   = inject(AngularFireFunctions);
+  private commoditySvc = inject(CommodityService);
+  private snackBar = inject(MatSnackBar);
+
   tags$!: Observable<string[]>;
   postID: string = '';
-  maxTags= 10;
+  maxTags = 10;
+  commodityNames: string[] = [];
 
   ngOnInit(): void {
     this.postID = this.afs.createId();
     this.tags$ = this.afs
       .doc<{ tags: string[] }>('utils/hashtags')
       .valueChanges()
-      .pipe(map(doc => doc?.tags || []));
+      .pipe(map((doc) => doc?.tags || []));
+    this.commoditySvc.getCommodityNames().subscribe((names) => {
+      this.commodityNames = names;
+    });
+
+    // 2) Watch content and validate on each change (debounced)
+    this.form
+      .get('content')!
+      .valueChanges.pipe(debounceTime(1000))
+      .subscribe((text) => this._validateCommodities(text || ''));
   }
   form = this.fb.group({
     title: [
@@ -95,7 +103,27 @@ export class PostCreateComponent implements OnInit {
     ],
     hashtags: this.fb.control<string[]>([]),
   });
-
+  private _validateCommodities(text: string) {
+    // regex to find $word tokens ending with space or end‑of‑string
+    const regex = /(\$[A-Za-z]+)(?=\s|$)/g;
+    let match: RegExpExecArray | null;
+    let cleaned = text;
+    while ((match = regex.exec(text))) {
+      const token = match[1]; // e.g. "$wood"
+      const symbol = token.substring(1);
+      if (!this.commodityNames.includes(symbol)) {
+        // remove invalid token
+        cleaned = cleaned.replace(token, '');
+        this.snackBar.open(`No such commodity: ${symbol}`, 'Dismiss', {
+          duration: 2000,
+        });
+      }
+    }
+    // if we stripped out anything, update the control without re‑triggering this logic
+    if (cleaned !== text) {
+      this.form.get('content')!.setValue(cleaned, { emitEvent: false });
+    }
+  }
   /** local file list & thumbnails */
   files: File[] = [];
   previews: string[] = [];
@@ -129,7 +157,7 @@ export class PostCreateComponent implements OnInit {
     this.files.splice(idx, 1);
     this.previews.splice(idx, 1);
   }
-  
+
   async savePost() {
     if (this.form.invalid) return;
 
@@ -143,13 +171,13 @@ export class PostCreateComponent implements OnInit {
 
     // Build the minimal draft
     const now = new Date();
-    const draft  = {
+    const draft = {
       id: this.postID,
       title: this.form.value.title!,
       content: this.form.value.content!,
       authorId: user.uid,
       username: user.username,
-      hashtags:  this.form.value.hashtags      
+      hashtags: this.form.value.hashtags,
     } as Partial<Post>;
 
     this.uploading = true;
@@ -158,11 +186,11 @@ export class PostCreateComponent implements OnInit {
     this.forumService
       .createPostWithImages(draft, this.postID, this.files)
       .pipe(
-        tap(post => {
+        tap((post) => {
           console.log('Created post with images:', post);
           this.router.navigate(['/forum', post.id]);
         }),
-        catchError(err => {
+        catchError((err) => {
           console.error(err);
           alert('Error creating post. Please try again later.');
           this.uploading = false;
@@ -171,7 +199,7 @@ export class PostCreateComponent implements OnInit {
       )
       .subscribe();
   }
-  toggleTag(tag: string) {    
+  toggleTag(tag: string) {
     const tags: string[] = this.form.value.hashtags || [];
     const idx = tags.indexOf(tag);
     if (idx >= 0) {
@@ -186,5 +214,4 @@ export class PostCreateComponent implements OnInit {
     }
     this.form.get('hashtags')!.setValue(tags);
   }
-
 }
