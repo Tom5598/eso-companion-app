@@ -1,42 +1,145 @@
 <mat-sidenav-container class="fill">
   <!-- FILTERS -->
-  <mat-sidenav mode="side" opened class="filters" disableClose>
+  <mat-sidenav
+    mode="side"
+    [opened]="showFilters"
+    class="filters"
+    disableClose
+    #drawer
+  >
+    <span>
+      <button mat-icon-button class="toggle-btn" (click)="toggleFilters()">
+        <mat-icon>
+          {{ showFilters ? "chevron_left" : "chevron_right" }}
+        </mat-icon>
+      </button>
+    </span>
+
     <h3 class="p-2">Filters</h3>
-    <!-- (later) -->
+    <form [formGroup]="filterForm" class="filter-form">
+      <!-- Title -->
+      <mat-form-field appearance="fill">
+        <mat-label>Title</mat-label>
+        <input matInput formControlName="titleFilter" />
+      </mat-form-field>
+      <!-- Order -->
+      <mat-form-field appearance="fill">
+        <mat-label>Order by Date</mat-label>
+        <mat-select formControlName="dateOrder">
+          <mat-option value="desc">Newest First</mat-option>
+          <mat-option value="asc">Oldest First</mat-option>
+        </mat-select>
+      </mat-form-field>
+      
+      <!-- Hot first -->
+      <mat-slide-toggle formControlName="hotFirst">Hot First</mat-slide-toggle>
+      <br>
+      <!-- Hashtags -->       
+      <button mat-button type="button" (click)="clearTags()">
+        Deselect All
+      </button>
+  
+      <!-- SCROLLABLE CHIP LIST -->
+      <div class="hashtag-scroll">
+        <mat-chip-listbox
+          aria-label="Tag selection"
+          multiple
+          formControlName="hashtags"
+        >
+          <mat-chip-option
+            *ngFor="let tag of tags$ | async"
+            [value]="tag"
+          >
+            #{{ tag }}
+          </mat-chip-option>
+        </mat-chip-listbox>
+      </div>
+      
+      <button mat-raised-button color="primary" (click)="applyFilters()">
+        Apply Filters
+      </button>
+    </form>
   </mat-sidenav>
 
   <!-- POSTS -->
   <mat-sidenav-content class="content">
-    <div class="posts" *ngIf="posts$ | async as posts">
+    <button
+      *ngIf="!showFilters"
+      mat-icon-button
+      class="content-toggle"
+      (click)="toggleFilters()"
+    >
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+    <ng-container *ngIf="posts$ | async as posts; else loading">
+    <div *ngIf="!(posts$ | async)?.length" class="no-posts">
+      <mat-card class="no-posts-card">
+        <mat-card-title>No posts found</mat-card-title>
+        <mat-card-content>
+          <p>Try changing the filters or creating a new post.</p>
+        </mat-card-content>
+      </mat-card>
+
+    </div>
+    <h1>Forum</h1>
+    <div class="view-toggle" >
+         <button
+           mat-icon-button
+           (click)="toggleView('list')"
+           [color]="viewMode === 'list' ? 'primary' : undefined"
+           matTooltip="List view"
+         >
+           <mat-icon>format_list_bulleted</mat-icon>
+         </button>
+         <button
+           mat-icon-button
+           (click)="toggleView('grid')"
+           [color]="viewMode === 'grid' ? 'primary' : undefined"
+           matTooltip="Grid view"
+         >
+           <mat-icon>grid_view</mat-icon>
+         </button>
+       </div>
+    <div class="posts" [ngClass]="viewMode" *ngIf="posts$ | async as posts">
+     
       <mat-card
         *ngFor="let post of posts"
         class="post-card"
         [routerLink]="['/forum', post.id]"
       >
-        <mat-card-title>{{ post.title }}</mat-card-title>
-        <mat-card-subtitle>
+        <mat-card-title class="truncate">{{ post.title }}</mat-card-title>
+        <mat-card-subtitle class="truncate">
           by {{ post.username }} ·
           {{ post.createdAt | toDate | date : "short" }}
         </mat-card-subtitle>
         <mat-card-content>
-          <p class="truncate">{{ post.content }}</p>          
+          <p class="truncate">{{ post.content }}</p>
           <mat-chip-set class="hashtags" *ngIf="post.hashtags?.length">
-            <mat-chip *ngFor="let tag of post.hashtags" > #{{ tag }} </mat-chip>
+            <mat-chip *ngFor="let tag of post.hashtags"> #{{ tag }} </mat-chip>
           </mat-chip-set>
         </mat-card-content>
         <mat-card-actions>
           <span>
-            <mat-icon color="primary" matTooltip="Comments" [matTooltipPosition]="'above'"
-            matTooltipHideDelay="100">comment</mat-icon>{{ post.commentCount }} 
+            <mat-icon
+              color="primary"
+              matTooltip="Comments"
+              [matTooltipPosition]="'above'"
+              matTooltipHideDelay="100"
+              >comment</mat-icon
+            >{{ post.commentCount }}
           </span>
-          
-          <span class="likeIcon" > 
-            <mat-icon color="warn" matTooltip="Likes"
-            [matTooltipPosition]="'above'"
-            matTooltipHideDelay="100">favorite</mat-icon>
+
+          <span class="likeIcon">
+            <mat-icon
+              color="warn"
+              matTooltip="Likes"
+              [matTooltipPosition]="'above'"
+              matTooltipHideDelay="100"
+              >favorite</mat-icon
+            >
             {{ post.likeCount }}
           </span>
-          
+
         </mat-card-actions>
       </mat-card>
     </div>
@@ -53,5 +156,11 @@
       <mat-icon>add</mat-icon>
     </button>
     }
+  </ng-container>
+
+  <!-- loading spinner -->
+  <ng-template #loading>
+    <app-loading-indicator></app-loading-indicator>
+  </ng-template>
   </mat-sidenav-content>
 </mat-sidenav-container>

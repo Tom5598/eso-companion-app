@@ -1,38 +1,168 @@
 .fill {
-    height: 100vh;
-  }
-  .filters {
-    width: 260px;
-  }
-  .content {
-    padding: 1rem;
-    position: relative;
-  }
-  .posts {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-width: 800px;
-  }
-  .post-card {
-    cursor: pointer;
-  }
-  .truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    -webkit-box-orient: vertical;
-  }
-  .fab {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-  }
-  mat-icon{
-    margin-bottom: -5px;
-  }
-  .likeIcon{
-    padding-left: 50px;
-  }
+  height: 100vh;
+}
+.filters {
+  width: 260px;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+.content {
+  padding: 1rem;
+  position: relative;
+}
+.posts {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 350px;
+}
+.post-card {
+  cursor: pointer;
+}
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+}
+mat-icon {
+  margin-bottom: -5px;
+}
+.likeIcon {
+  padding-left: 50px;
+}
+.toggle-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 1.5rem;
+  background: rgb(27, 171, 228);
+  z-index: 10;
+}
+
+.content-toggle {
+  position: absolute;
+  top: 10px;
+  left: 0px;
+  z-index: 10;
+  background-color: rgb(27, 171, 228);
+}
+
+.hashtags {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+.no-posts{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 200px);
+  font-size: 1.5rem;
+  color: #888;
+  transition: all 0.3s ease;
+}
+.no-posts-card{
+  padding: 10px;
+  text-align: center;
+}
+h1{
+  margin-top: -15px;
+  position: absolute;
+  width: 100%;
+  text-align: center;
+}
+.hashtag-scroll {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+.filter-form{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 5px;
+}
+
+/* Container for list/grid toggle */
+.view-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0; 
+  padding-left: 50px;
+}
+
+/* LIST layout: one card per row */
+.posts.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* GRID layout: responsive grid */
+.posts.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+/* Ensure each card fills its grid cell */
+.posts.grid .post-card {
+  width: 100%;
+}
+.posts.grid .post-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.posts.grid .post-card mat-card-content {
+  /* Let content grow to push actions down */
+  flex: 1 1 auto;
+}
+
+.posts.grid .post-card mat-card-actions {
+  /* Push this to the bottom */
+  margin-top: auto;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Compact hashtag chips in grid view */
+.posts.grid .hashtags mat-chip {
+  font-size: 0.05rem;
+  height: 18px;
+  line-height: 18px;
+  padding: 0 2px;
+}
+
+/* Tighter wrapping & spacing */
+.posts.grid .hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+.post-card .mat-card-title,
+.post-card .mat-card-subtitle {
+  display: -webkit-box;            /* make this a flexbox for line‑clamp */
+  -webkit-box-orient: vertical;    /* vertical stacking */
+  -webkit-line-clamp: 2;  
+  line-clamp: 2;         /* limit to 2 lines */
+  overflow: hidden;                /* hide the rest */
+  text-overflow: ellipsis;         /* add “…” */
+}
+
+/* (Optional) add a bit of bottom margin so lines don’t run together */
+.post-card .mat-card-title {
+  margin-bottom: 0.25rem;
+}

@@ -21,6 +21,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
+import { LoadingIndicatorComponent } from '../../../components/loading-indicator/loading-indicator.component';
 
 
 
@@ -29,7 +30,7 @@ import { MatChipsModule } from '@angular/material/chips';
   selector: 'app-post-detail',
   standalone: true,
   imports: [MatButtonModule,MatCardModule,CommonModule, ToDatePipe,
-    MatIcon, MatTooltipModule, MatChipsModule,
+    MatIcon, MatTooltipModule, MatChipsModule,LoadingIndicatorComponent,
   ],
   templateUrl: './post-detail.component.html',
   styleUrl: './post-detail.component.scss'
@@ -41,6 +42,7 @@ export class PostDetailComponent implements OnInit {
   currentUserId$:any;
   isLiked$!: Observable<boolean>;
   currentUserId: string | null = null;
+  loadedMap: Record<string, boolean> = {};
   @Output() 
   postEdited = new EventEmitter<Post>();
   @Output() 
@@ -51,7 +53,8 @@ export class PostDetailComponent implements OnInit {
     private auth: AuthService,
     private bottomSheet :MatBottomSheet,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+     private router: Router,
   ) {}  
    
   async ngOnInit(){   
@@ -68,9 +71,16 @@ export class PostDetailComponent implements OnInit {
       } else {
         this.isLiked$ = of(false);
       }
+    });
+    this.post$.subscribe(post => {
+      // reset all to false whenever the post changes
+      this.loadedMap = {};
+      (post.linkedPictures || []).forEach(url => this.loadedMap[url] = false);
     });    
   }
-
+  onImageLoad(url: string) {
+    this.loadedMap[url] = true;
+  }
   async loadUser(){     
     this.currentUserId$  = await firstValueFrom(this.auth.getCurrentUser().pipe(take(1)));
   }
@@ -120,5 +130,33 @@ export class PostDetailComponent implements OnInit {
         console.error('Failed to copy link', err);
         this.snackBar.open('Could not copy link', 'Dismiss', { duration: 3000 });
       });
+  }
+  onDeletePost(postId: string) {
+    if (!confirm('Delete this post? This cannot be undone.')) return;
+    this.forum.deletePost(postId).subscribe({
+      next: () => {
+        this.snackBar.open('Post deleted', 'Dismiss', { duration: 3000 });
+        this.router.navigate(['/forum']);
+      },
+      error: err => {
+        console.error(err);
+        this.snackBar.open('Could not delete post', 'Dismiss', { duration: 3000 });
+      }
+    });
+  }
+   /** Delete a comment under this post and refresh the comments list */
+   onDeleteComment(commentId: string) {
+    if (!confirm('Delete this comment?')) return;
+    this.forum.deleteComment(this.postId, commentId).subscribe({
+      next: () => {
+        this.snackBar.open('Comment deleted', 'Dismiss', { duration: 2000 });
+        // reload comments$
+        this.comments$ = this.forum.getForumPostComments(this.postId);
+      },
+      error: err => {
+        console.error(err);
+        this.snackBar.open('Could not delete comment', 'Dismiss', { duration: 2000 });
+      }
+    });
   }
 }

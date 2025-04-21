@@ -42,6 +42,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { MatChipsModule }   from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
 @Component({
   selector: 'app-post-create',
   standalone: true,
@@ -53,13 +54,13 @@ import { MatChipsModule }   from '@angular/material/chips';
     MatButtonModule,
     MatCardModule,
     MatIconModule,
-    MatProgressBarModule,MatChipsModule,
+    MatProgressBarModule,MatChipsModule,MatTooltipModule,
   ],
   templateUrl: './post-create.component.html',
   styleUrls: ['./post-create.component.scss'],
 })
 export class PostCreateComponent implements OnInit {
-  postID: string = '';
+  
 
   private fb = inject(FormBuilder);
   private storage = inject(AngularFireStorage);
@@ -69,6 +70,9 @@ export class PostCreateComponent implements OnInit {
   private router = inject(Router);
   private fns   = inject(AngularFireFunctions);
   tags$!: Observable<string[]>;
+  postID: string = '';
+  maxTags= 10;
+
   ngOnInit(): void {
     this.postID = this.afs.createId();
     this.tags$ = this.afs
@@ -167,12 +171,17 @@ export class PostCreateComponent implements OnInit {
       )
       .subscribe();
   }
-  toggleTag(tag: string) {
+  toggleTag(tag: string) {    
     const tags: string[] = this.form.value.hashtags || [];
     const idx = tags.indexOf(tag);
     if (idx >= 0) {
       tags.splice(idx, 1);
     } else {
+      if (tags.length >= this.maxTags) {
+        // optional: notify the user
+        alert(`You can select up to ${this.maxTags} tags.`);
+        return;
+      }
       tags.push(tag);
     }
     this.form.get('hashtags')!.setValue(tags);

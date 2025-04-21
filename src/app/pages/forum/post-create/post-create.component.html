@@ -22,15 +22,20 @@
     } @if (form.get('content')?.hasError('maxlength')) {
     <mat-error> Content is too long!</mat-error>
     }
-  </mat-form-field>
+  </mat-form-field><br><br>
   <!-- Hashtag picker -->
-  <mat-label>Available tags:</mat-label>
+  <mat-label matTooltip="You can add up to 10 hastags to a post" [matTooltipPosition]="'above'"
+  matTooltipHideDelay="100" class="tagsTip">Available tags:</mat-label><br><br>
   <mat-chip-listbox aria-label="Tag selection" multiple>
     <mat-chip-option
       *ngFor="let tag of tags$ | async"
       [value]="tag"
       [selected]="form.value.hashtags?.includes(tag)"
       (selectionChange)="toggleTag(tag)"
+      [disabled]="
+      !(form.value.hashtags?.includes(tag))
+      && (form.value.hashtags?.length ?? 0) >= maxTags
+    "
     >
       {{ tag }}
     </mat-chip-option>

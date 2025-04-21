@@ -55,7 +55,7 @@ export class CommentCreateComponent {
           }
           const content = this.form.value.content!;
           this.forum
-            .createCommentPromise(
+            .createCommentTransaction(
               {
                 authorId: user.uid, username: (user as any).username || user.email!,
                  content,
