@@ -6,36 +6,49 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 // RxJS
-import { Subscription, switchMap, finalize, Observable } from 'rxjs';
+import { Subscription, switchMap, finalize, Observable, map, of } from 'rxjs';
 
+
+// Angular
+import { MatTabsModule }   from '@angular/material/tabs';
+import { MatListModule }   from '@angular/material/list';
 import { AuthService } from '../../services/auth.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-
+import { UserService } from '../../services/user.service';
+import { Notification } from '../../models/notification.model';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTabsModule,
+    MatListModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
 export class ProfileComponent implements OnInit, OnDestroy {
+  @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
   user: any;
   userData: any;
   private authSub!: Subscription;
   private userDocSub!: Subscription;
   defaultPicUrl = '';
-  @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+  unread$!: Observable<Notification[]>;
+  read$!: Observable<Notification[]>;
   
   constructor(
-    private authService: AuthService,
+    private auth: AuthService,
     private firestore: AngularFirestore,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private userSvc: UserService
   ) {}
 
   ngOnInit(): void {
     //Gets  loggedin user
-    this.authSub = this.authService
+    this.authSub = this.auth
       .getCurrentUser()
       .subscribe((currentUser) => {
         this.user = currentUser;
@@ -47,6 +60,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
       .subscribe(url => {
         this.defaultPicUrl = url;
       });
+      // 3) load notifications streams
+    this.unread$ = this.auth.getCurrentUser().pipe(
+      switchMap(u => u ? this.userSvc.getNotifications(u.uid) : of([])),
+      map(arr => arr.filter((n ) => !n.read))
+    );
+    this.read$ = this.auth.getCurrentUser().pipe(
+      switchMap(u => u ? this.userSvc.getNotifications(u.uid) : of([])),
+      map(arr => arr.filter(n => n.read))
+    );
   }
   loadUserData(uid: string) {
     //Load the user's data from
@@ -58,12 +80,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.userData = data;
       });
   }
+   /** Dismiss moves it to “read” */
+   dismiss(n: Notification) {    
+    if (!this.user) return;
+    this.userSvc.markAsRead(this.userData.uid, n.id);
+  }
   onSelectProfilePic() {
     // This triggers the hidden file input
     this.fileInputRef.nativeElement.click();
-    
-   
-  
   }
 
   async onFileSelected(event: Event) {

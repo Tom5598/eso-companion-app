@@ -197,6 +197,9 @@ export class PostDetailComponent implements OnInit {
           console.log('postEdit', result);
           this.postEdited.emit(result);
           this.post$ = of(result);
+          result.linkedPictures.forEach((url:any) => {
+            this.onImageLoad(url);
+          });
         }
       });
   }

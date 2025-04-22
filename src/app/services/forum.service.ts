@@ -24,6 +24,7 @@ import { Comment } from '../models/comment.model';
 import { convertSnapsToType } from '../util/db-utils';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { PostFilterOptions } from '../models/post-filter-options.model';
+import { Notification } from '../models/notification.model';
 @Injectable({
   providedIn: 'root',
 })
@@ -49,7 +50,7 @@ export class ForumService {
       .collection('forum')
       .doc(id)
       .collection('comments', (ref) => ref.orderBy('createdAt', 'desc'))
-      .valueChanges({ idField: 'id' }) as Observable<Comment[]>       
+      .valueChanges({ idField: 'id' }) as Observable<Comment[]>;
   }
   getForumCommentsByUser(userID: string): Observable<Comment[]> {
     return this.afs
@@ -136,33 +137,51 @@ export class ForumService {
     partial: Omit<Comment, 'id' | 'createdAt' | 'updatedAt' | 'commentNumber'>,
     postId: string
   ): Promise<void> {
-    const commentId  = this.afs.createId();
-    const now        = new Date();
-    const commentRef = this.afs.firestore.doc(`forum/${postId}/comments/${commentId}`);
-    const postRef    = this.afs.firestore.doc(`forum/${postId}`);
+    const commentId = this.afs.createId();
+    const now = new Date();
+    const commentRef = this.afs.firestore.doc(
+      `forum/${postId}/comments/${commentId}`
+    );
+    const postRef = this.afs.firestore.doc(`forum/${postId}`);
 
     // Build the full Comment payload
     const data: Comment = {
-      id:            commentId,
-      authorId:      partial.authorId,
-      username:      partial.username,
-      content:       partial.content,
-      createdAt:     now,
-      updatedAt:     now,
-      isLocked:      false,
-      isEdited:      false,
-      isHidden:      false
+      id: commentId,
+      authorId: partial.authorId,
+      username: partial.username,
+      content: partial.content,
+      createdAt: now,
+      updatedAt: now,
+      isLocked: false,
+      isEdited: false,
+      isHidden: false,
     };
 
     // Run a single transaction: read postCount → write comment → update count
-    return this.afs.firestore.runTransaction(async tx => {
+    return this.afs.firestore.runTransaction(async (tx) => {
       // 1) Read current commentCount
-      const postSnap   = await tx.get(postRef);
-      const prevCount  = (postSnap.data()?.['commentCount'] ?? 0) as number;
+      const postSnap = await tx.get(postRef);
+      const prevCount = (postSnap.data()?.['commentCount'] ?? 0) as number;
+      //Notification part
+      if (partial.authorId != postSnap.data()?.['authorId']) {
+        const postAuthorId = postSnap.data()?.['authorId'] as string;
+        const postTitle = postSnap.data()?.['title'] as string;
+        const notificationID = this.afs.createId();
+        const notificationRef = this.afs.firestore.doc(
+          `users/${postAuthorId}/notifications/${notificationID}`
+        );
+        const notification: Notification = {
+          id: notificationID,
+          type: 'info',
+          date: now,
+          read: false,
+          message: `New comment on your post: ${postTitle} by ${partial.username}`,
+        };
+        tx.set(notificationRef, notification);
+      }
 
       // 2) Create the new comment
       tx.set(commentRef, data);
-
       // 3) Increment the post’s commentCount
       tx.update(postRef, { commentCount: prevCount + 1 });
     });
@@ -288,11 +307,9 @@ export class ForumService {
     const ref = this.storage.refFromURL(imageUrl);
     return from(ref.delete()).pipe(
       concatMap(() =>
-        this.afs
-          .doc(`forum/${postId}`)
-          .update({
-            linkedPictures: firebase.firestore.FieldValue.arrayRemove(imageUrl),
-          })
+        this.afs.doc(`forum/${postId}`).update({
+          linkedPictures: firebase.firestore.FieldValue.arrayRemove(imageUrl),
+        })
       )
     );
   }

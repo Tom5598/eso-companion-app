@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 import { AuthService } from '../../services/auth.service';
+import { ProfileMenuComponent } from '../profile-menu/profile-menu.component';
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -15,7 +16,9 @@ import { AuthService } from '../../services/auth.service';
     RouterModule,
     MatToolbarModule,
     MatButtonModule,
-    MatIconModule],
+    MatIconModule,
+    ProfileMenuComponent
+  ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })

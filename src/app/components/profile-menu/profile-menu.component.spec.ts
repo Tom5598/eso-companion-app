@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TmpComponent } from './tmp.component';
+import { ProfileMenuComponent } from './profile-menu.component';
 
-describe('TmpComponent', () => {
-  let component: TmpComponent;
-  let fixture: ComponentFixture<TmpComponent>;
+describe('ProfileMenuComponent', () => {
+  let component: ProfileMenuComponent;
+  let fixture: ComponentFixture<ProfileMenuComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TmpComponent]
+      imports: [ProfileMenuComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TmpComponent);
+    fixture = TestBed.createComponent(ProfileMenuComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -29,5 +29,66 @@
   <div *ngIf="userData">
     <p><strong>Email:</strong> {{ user?.email }}</p>
     <p><strong>Username:</strong> {{ userData.username }}</p>
-  </div>
+  </div> 
+  <mat-tab-group class="notifications-tabs">
+    <!-- Unread Tab -->
+    <mat-tab label="Unread">
+      <div class="notification-list">
+        <ng-container *ngIf="(unread$ | async) as notifs; else noneUnread">
+          <div
+            class="notification-row"
+            *ngFor="let n of notifs"
+          >
+            <!-- 1) Icon Column -->
+            <mat-icon class="icon" color="primary" >
+              {{ n.type === 'warning' ? 'warning' : 'info' }}
+            </mat-icon>
+  
+            <!-- 2) Content Column: date on top, message below -->
+            <div class="content">
+              <div class="date">{{ n.date | date:'short' }}</div>
+              <div class="message">{{ n.message }}</div>
+            </div>
+  
+            <!-- 3) Action Column -->
+            <button
+              mat-button
+              color="accent"
+              (click)="dismiss(n)"
+            >
+              Dismiss
+            </button>
+          </div>
+        </ng-container>
+        <ng-template #noneUnread>
+          <p class="no-notifs">No unread notifications.</p>
+        </ng-template>
+      </div>
+    </mat-tab>
+
+    <!-- Read Tab -->
+    <mat-tab label="Read">
+      <div class="notification-list">
+        <ng-container *ngIf="(read$ | async) as notifs; else noneRead">
+          <div
+            class="notification-row"
+            *ngFor="let n of notifs"
+          >
+            <mat-icon class="icon" color="primary">
+              {{ n.type === 'warning' ? 'warning' : 'info' }}
+            </mat-icon>
+            <div class="content">
+              <div class="date">{{ n.date | date:'short' }}</div>
+              <div class="message">{{ n.message }}</div>
+            </div>
+            <!-- no dismiss button in Read tab -->
+            <span class="spacer"></span>
+          </div>
+        </ng-container>
+        <ng-template #noneRead>
+          <p class="no-notifs">No read notifications.</p>
+        </ng-template>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 </mat-card>

@@ -1,28 +1,18 @@
 <mat-toolbar color="primary" class="navbar-container">
   <!-- Logo / Home -->
   <button mat-button routerLink="/"><mat-icon>home</mat-icon> Home</button>
-
   <!-- Forum -->
   <button mat-button routerLink="/forum">
     <mat-icon>forum</mat-icon> Forum
   </button>
-  <button mat-button routerLink="/tmp">
-    <mat-icon>hourglass_empty</mat-icon> TMP
-  </button>
+  <span class="spacer"></span>
+  <!-- Only show our profile menu when logged in -->
+  <app-profile-menu *ngIf="isLoggedIn"></app-profile-menu>
   <!-- If NOT logged in, show login/register -->
   <button mat-button routerLink="/login" *ngIf="!isLoggedIn">
     <mat-icon>login</mat-icon> Login
   </button>
   <button mat-button routerLink="/register" *ngIf="!isLoggedIn">
     <mat-icon>person_add</mat-icon> Register
-  </button>
-
-  <!-- If logged in, show profile/logout -->
-  <span class="spacer"></span>
-  <button mat-button routerLink="/profile" *ngIf="isLoggedIn">
-    <mat-icon>person</mat-icon> Profile
-  </button>
-  <button mat-button (click)="onLogout()" *ngIf="isLoggedIn">
-    <mat-icon>exit_to_app</mat-icon> Logout
   </button>
 </mat-toolbar>

@@ -1,0 +1,27 @@
+/* src/app/components/profile-menu/profile-menu.component.scss */
+.profile-menu {
+  display: flex;
+  align-items: center;
+  background-color: rgb(28, 184, 223);
+  border-radius: 8px;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 4px;
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 8px;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+
+  .username {
+    margin-right: 12px;
+    font-weight: 500;
+  }
+}
+.logout:hover {
+  cursor: pointer;
+  color: #ff4d4d;
+}
