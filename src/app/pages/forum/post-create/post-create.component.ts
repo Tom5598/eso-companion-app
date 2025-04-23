@@ -39,6 +39,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommodityService } from '../../../services/commodity.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { CommodityNames } from '../../../models/commodity-names.model';
 
 @Component({
   selector: 'app-post-create',
@@ -70,7 +71,7 @@ export class PostCreateComponent implements OnInit {
   tags$!: Observable<string[]>;
   postID: string = '';
   maxTags = 10;
-  commodityNames: string[] = [];
+  commodityNames: CommodityNames[] = [];
 
   ngOnInit(): void {
     this.postID = this.afs.createId();
@@ -104,22 +105,32 @@ export class PostCreateComponent implements OnInit {
     hashtags: this.fb.control<string[]>([]),
   });
   private _validateCommodities(text: string) {
-    // regex to find $word tokens ending with space or end‑of‑string
+    // regex to find $word tokens ending with space or end-of-string
     const regex = /(\$[A-Za-z]+)(?=\s|$)/g;
     let match: RegExpExecArray | null;
     let cleaned = text;
+  
     while ((match = regex.exec(text))) {
-      const token = match[1]; // e.g. "$wood"
-      const symbol = token.substring(1);
-      if (!this.commodityNames.includes(symbol)) {
-        // remove invalid token
+      const token  = match[1];        // e.g. "$wood"
+      const symbol = token.substring(1) ;
+  
+      // look for a matching commodity name (case-insensitive)
+      const exists = this.commodityNames.some(
+        c => c?.name.toLowerCase()  === symbol
+      );
+      console.log(`Checking "${symbol}"...`, exists);
+      console.log("commodityNames", this.commodityNames);
+      
+      if (!exists) {
+        // strip out invalid token
         cleaned = cleaned.replace(token, '');
         this.snackBar.open(`No such commodity: ${symbol}`, 'Dismiss', {
           duration: 2000,
         });
       }
     }
-    // if we stripped out anything, update the control without re‑triggering this logic
+  
+    // if we removed anything, update control without retriggering validation
     if (cleaned !== text) {
       this.form.get('content')!.setValue(cleaned, { emitEvent: false });
     }

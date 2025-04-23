@@ -42,4 +42,10 @@ export class RegisterComponent {
         },
       });
   }
+  onGoogleSignIn() {
+    this.authService.googleSignIn().subscribe({
+      next: () => this.router.navigate(['/home']),
+      error: err => this.errorMessage = err.message
+    });
+  }
 }

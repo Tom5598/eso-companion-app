@@ -10,12 +10,13 @@ import {
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCard, MatCardModule } from '@angular/material/card';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Post } from '../../../models/post.model';
 import {
   combineLatest,
   debounceTime,
   distinctUntilChanged,
+  filter,
   firstValueFrom,
   from,
   map,
@@ -49,8 +50,8 @@ import { CommodityPopupComponent } from '../../../components/commodity-popup/com
 import { CommodityService } from '../../../services/commodity.service';
 import { Commodity } from '../../../models/commodity.model';
 import { ChartConfiguration } from 'chart.js';
-
-type Token = { type: 'text' | 'commodity'; value: string };
+import { CommodityNames } from '../../../models/commodity-names.model';
+type Token = { type: 'text' | 'commodity'; value: string , link : string};
 @Component({
   selector: 'app-post-detail',
   standalone: true,
@@ -62,13 +63,12 @@ type Token = { type: 'text' | 'commodity'; value: string };
     MatIcon,
     MatTooltipModule,
     MatChipsModule,
-    LoadingIndicatorComponent,
-    CommodityPopupComponent,
+    LoadingIndicatorComponent,RouterModule
   ],
   templateUrl: './post-detail.component.html',
-  styleUrl: './post-detail.component.scss', 
+  styleUrl: './post-detail.component.scss',
 })
-export class PostDetailComponent implements OnInit {
+export class PostDetailComponent implements OnInit { 
   postId!: string;
   post$: Observable<Post> = new Observable<Post>();
   comments$: Observable<Comment[]> = new Observable<Comment[]>();
@@ -77,12 +77,7 @@ export class PostDetailComponent implements OnInit {
   currentUserId: string | null = null;
   loadedMap: Record<string, boolean> = {};
   //parsing tokens for mentions
-  contentTokens: { type: 'text' | 'commodity'; value: string }[] = [];
-  // For hover mechanics
-  clickedCommodity!: Commodity | null;
-  clickedChartConfig!: ChartConfiguration<'line'>;
-  popupX = 0;
-  popupY = 0;
+  contentTokens: {type: 'text' | 'commodity'; value: string; link?: string}[] = [];
 
   @Output()
   postEdited = new EventEmitter<Post>();
@@ -96,15 +91,46 @@ export class PostDetailComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private router: Router,
-    private commoditySvc: CommodityService, 
+    private commoditySvc: CommodityService
   ) {}
 
   async ngOnInit() {
     this.postId = this.route.snapshot.paramMap.get('id')!;
-    this.post$ = this.forum.getForumPostById(this.postId).pipe(
-      tap(post => {
-        this.contentTokens = this.tokenize(post.content);          
-      })
+
+    // 1) Grab your name→link list exactly once
+    const names$: Observable<CommodityNames[]> =
+      this.commoditySvc
+        .getCommodityNames()
+        .pipe(shareReplay(1));
+
+    // 2) Combine the real-time post stream with that lookup table
+    this.post$ = combineLatest([
+      this.forum.getForumPostById(this.postId),  // streams forever
+      names$
+    ]).pipe(
+      // 3) On every emission, build the lookup map & tokenize
+      tap(([post, names]) => {
+        if (!post) {
+          // no such doc → 404
+          this.router.navigate(['/not-found']);
+          return;
+        }
+
+        // build quick lookup: { "wood": "/market/wood-id", ... }
+        const lookup: Record<string,string> = {};
+        for (const n of names) {
+          lookup[n.name.toLowerCase()] = n.link;
+        }
+
+        // split + enrich tokens
+        this.contentTokens = this.tokenize(post.content, lookup);
+      }),
+
+      // 4) throw away any null post, so downstream sees only Post
+      filter((pair): pair is [Post, CommodityNames[]] => pair[0] !== null),
+
+      // 5) map back to the Post itself
+      map(([post]) => post)
     );
     this.comments$ = this.forum.getForumPostComments(this.postId);
     const user = await firstValueFrom(this.auth.getCurrentUser().pipe(take(1)));
@@ -125,53 +151,25 @@ export class PostDetailComponent implements OnInit {
         (url) => (this.loadedMap[url] = false)
       );
     });
-     
   }
-
-   
-   /** Called on tag click */
-   onTagClick(symbol: string, e: MouseEvent) {
-    const rect = (e.target as HTMLElement).getBoundingClientRect();
-    //get window width and height
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-    this.popupX = windowWidth/2 - 200;
-    this.popupY = windowHeight/2 - 300;
-
-    this.commoditySvc.getCommodityByName(symbol)
-    .pipe(
-      take(1),
-      map((c)=>{
-        this.clickedCommodity = c;
-        // build chart config same as before
-        const last30 = c.historical.slice(-30);
-        const dates  = last30.map(h => h.date );
-        const prices = last30.map(h => h.price);
-        this.clickedChartConfig = {
-          type: 'line',
-          data: { labels: dates, datasets:[{ data: prices, label:'Price', fill:false, tension:0.1 }] },
-          options: { responsive:true, plugins:{legend:{display:false}}, scales:{x:{display:false}} }
-        };
-      }),
-      shareReplay(1)).subscribe();
-  }
-
-  /** Manually close the popup */
-  closePopup() {
-    this.clickedCommodity = null;     
-  }
-
-  private tokenize(text: string): Token[] {
+  count = 0;
+  private tokenize(text: string, lookup: Record<string, string>): Token[] {
+    this.count++;
+    // split on $word tokens
     const parts = text.split(/(\$[A-Za-z]+)/g);
-    return parts.map(p =>
-      /^\$[A-Za-z]+$/.test(p)
-        ? { type: 'commodity' as const, value: p.substring(1) }
-        : { type: 'text' as const, value: p }
-    );
-  }
-
-  trackByToken(_: number, t: { type: string; value: string }) {
-    return t.type + '|' + t.value;
+    return parts.map((p) => {
+      const m = /^\$([A-Za-z]+)$/.exec(p);
+      if (m) {
+        const name = m[1];
+        const link = lookup[name.toLowerCase()];
+        if (link) {
+          console.log('count:',this.count,`Found commodity: ${name} → ${link}`);
+          
+          return { type: 'commodity', value: name, link: link };
+        }
+      }
+      return { type: 'text', value: p, link: '' };
+    });
   }
 
   onImageLoad(url: string) {
@@ -194,19 +192,24 @@ export class PostDetailComponent implements OnInit {
       .afterClosed()
       .subscribe((result) => {
         if (result) {
-          console.log('postEdit', result);
-          this.postEdited.emit(result);
-          this.post$ = of(result);
-          result.linkedPictures.forEach((url:any) => {
-            this.onImageLoad(url);
+          // write the changes back into Firestore:
+          this.forum.updatePost(this.postId, {
+            title:   result.title,
+            content: result.content,
+            isEdited: true,
+            updatedAt: new Date()
+          }).subscribe({
+            next: () => {
+              // snackbar, etc. no need to touch post$ 
+            },
+            error: err => { /* handle error */ }
           });
         }
       });
   }
 
   openComment() {
-    const id = this.route.snapshot.paramMap.get('id')!;
-    console.log('openComment creation with id:', id);
+    const id = this.postId!;
     this.bottomSheet.open(CommentCreateComponent, {
       data: { postId: id },
     });

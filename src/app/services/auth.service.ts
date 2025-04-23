@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { User } from '../models/user.model';
-import firebase from 'firebase/compat/app';
+import firebase from 'firebase/compat/app'; 
 import { from, Observable, of, switchMap } from 'rxjs';
+import { GoogleAuthProvider } from '@angular/fire/auth';
 @Injectable({
   providedIn: 'root',
 })
@@ -47,7 +48,28 @@ export class AuthService {
         .catch((error) => {})
     );
   }
-
+  googleSignIn(): Observable<any> {
+    const provider = new GoogleAuthProvider();                // ← instantiate here
+    return from(
+      this.afAuth.signInWithPopup(provider)
+        .then((credential) => {
+          const fbUser = credential.user;
+          if (!fbUser) return;
+          const uid = fbUser.uid;
+          const userData: User = {
+            uid,
+            email: fbUser.email!,
+            username: fbUser.displayName || '',
+            photoURL: fbUser.photoURL || '',
+            createdAt: new Date()
+          };
+          // merge: true so we don’t overwrite custom fields if user already exists
+          return this.firestore
+            .doc(`users/${uid}`)
+            .set(userData, { merge: true });
+        })
+    );
+  }
   login(email: string, password: string): Observable<any> {
     return from(this.afAuth.signInWithEmailAndPassword(email, password));
   }

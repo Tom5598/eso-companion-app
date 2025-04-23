@@ -26,6 +26,14 @@
       Login
     </button>
   </form>
+  <button
+  mat-raised-button
+  color="accent"
+  type="button"
+  (click)="onGoogleSignIn()"
+>
+  Sign in with Google
+</button>
 
   <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
 </mat-card>

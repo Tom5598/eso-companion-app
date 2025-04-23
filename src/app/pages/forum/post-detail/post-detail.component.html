@@ -15,35 +15,20 @@
     <!-- Content -->
     <mat-card-content>
       <p class="post-content">
-        <ng-container *ngFor="let t of contentTokens; trackBy: trackByToken">
-          <ng-container *ngIf="t.type==='text'">{{ t.value }}</ng-container>
-          <ng-container *ngIf="t.type==='commodity'">
-            <span
-              class="commodity-tag"
-              (click)="onTagClick(t.value, $event)"
+        <ng-container *ngFor="let t of contentTokens">
+          <ng-container *ngIf="t.type === 'text'">
+            {{ t.value }}
+          </ng-container>
+          <ng-container *ngIf="t.type === 'commodity'">
+            <a
+              class="commodity-link" 
+              [href]="[t.link]"
             >
               ${{ t.value }}
-            </span>
+            </a>
           </ng-container>
         </ng-container>
       </p>
-
-      <!-- Popup on click -->
-      <div
-        *ngIf="clickedCommodity"
-        class="commodity-popup-wrapper"
-        [style.left.px]="popupX"
-        [style.top.px]="popupY"
-      >
-        <!-- close button -->
-        <button mat-icon-button class="close-btn" (click)="closePopup()">
-          <mat-icon>close</mat-icon>
-        </button>
-        <app-commodity-popup
-          [commodity]="clickedCommodity"
-          [config]="clickedChartConfig"
-        ></app-commodity-popup>
-      </div>
     </mat-card-content>
 
     <!-- Linked pictures -->

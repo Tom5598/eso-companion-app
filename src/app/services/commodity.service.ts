@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { map, Observable, tap } from 'rxjs';
 import { Commodity } from '../models/commodity.model';
+import { CommodityNames } from '../models/commodity-names.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,15 @@ export class CommodityService {
    }
 
 // Master list of names for autocomplete
-getCommodityNames(): Observable<string[]> {
+getCommodityNames(): Observable<CommodityNames[]> {
+  return this.afs
+    .doc<{ commodityNames: CommodityNames[] }>('utils/misc')
+    .valueChanges()
+    .pipe(
+      map(doc => doc?.commodityNames ?? [])
+    );
+}
+getCommodityNamesss(): Observable<string[]> {
   return this.afs
     .doc<{ commodityNames: string[] }>('utils/misc')
     .valueChanges()
