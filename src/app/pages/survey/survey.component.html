@@ -1,0 +1,53 @@
+<form *ngIf="survey" (ngSubmit)="submit()">
+  <mat-card class="survey-card">
+    
+    <button mat-stroked-button color="warn" type="button" (click)="cancel()" class="cancel" >Cancel</button>
+    <h2 class="survey-title">
+      {{ survey.name }} — Question {{ currentIndex + 1 }} of {{ survey.questions.length }}
+    </h2> 
+    <ng-container *ngFor="let question of survey.questions; let i = index">
+      <div *ngIf="currentIndex === i" class="question-page">
+        <p class="survey-question"><strong>{{ question }}</strong></p>
+
+        <mat-slider discrete="true"
+          thumbLabel
+          tickInterval="1"
+          step="1"
+          min="1"
+          max="10"
+          class="survey-slider"
+        >
+          <input
+            matSliderThumb
+            [(ngModel)]="responses[i]"
+            name="resp{{i}}"
+          />
+        </mat-slider>
+
+        <div class="response-value">
+          Your answer: {{ responses[i] }}
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="navigation-buttons">
+      <button mat-button type="button" (click)="prev()" [disabled]="currentIndex === 0"  
+      matTooltip="Previous Question"
+      matTooltipPosition="above"
+      matTooltipShowDelay="200"><mat-icon>arrow_backward</mat-icon> </button>
+      <button 
+        matTooltip="Next Question"
+        matTooltipPosition="above"
+        matTooltipShowDelay="200"
+        mat-button
+        type="button"
+        (click)="next()"
+        [disabled]="currentIndex === survey.questions.length - 1"
+      > <mat-icon>arrow_forward</mat-icon> </button>
+    </div>
+    <br>    <div class="action-buttons" >
+      <button mat-raised-button color="primary" type="submit"  *ngIf="currentIndex === survey.questions.length - 1">Submit Survey</button>
+      
+    </div>
+  </mat-card> 
+</form>

@@ -10,6 +10,8 @@ import { PostEditComponent } from './pages/forum/post-edit/post-edit.component';
 import { PostDetailComponent } from './pages/forum/post-detail/post-detail.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { PostExistsGuard } from './guards/post-exist.guard';
+import { SurveyComponent } from './pages/survey/survey.component';
+import { SurveyGuard } from './guards/survey.guard';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -20,6 +22,7 @@ export const routes: Routes = [
     { path: 'forum/:id', component :PostDetailComponent, canActivate: [PostExistsGuard] },     
     { path: 'home', component: HomeComponent },
     { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+    { path: 'survey/:surveyId', component: SurveyComponent, canActivate: [SurveyGuard]},
     { path: 'not-found', component: PageNotFoundComponent,   },
     { path: '**', component: PageNotFoundComponent,  },
     {path: '', redirectTo: 'home', pathMatch: 'full'},

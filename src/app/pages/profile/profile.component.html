@@ -91,4 +91,15 @@
       </div>
     </mat-tab>
   </mat-tab-group>
+  <mat-form-field appearance="fill" *ngIf="(incompleteSurveys$ | async)?.length">
+    <mat-label>Available Surveys</mat-label>
+    <mat-select (selectionChange)="onSelectSurvey($event.value)">
+      <mat-option
+        *ngFor="let s of incompleteSurveys$ | async"
+        [value]="s.id"
+      >
+        {{ s.name  }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
 </mat-card>

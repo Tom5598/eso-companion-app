@@ -82,7 +82,6 @@ export class PostCreateComponent implements OnInit {
     this.commoditySvc.getCommodityNames().subscribe((names) => {
       this.commodityNames = names;
     });
-
     // 2) Watch content and validate on each change (debounced)
     this.form
       .get('content')!
@@ -118,9 +117,7 @@ export class PostCreateComponent implements OnInit {
       const exists = this.commodityNames.some(
         c => c?.name.toLowerCase()  === symbol
       );
-      console.log(`Checking "${symbol}"...`, exists);
-      console.log("commodityNames", this.commodityNames);
-      
+      console.log(`Checking whether "${symbol}" exists...`, exists);      
       if (!exists) {
         // strip out invalid token
         cleaned = cleaned.replace(token, '');

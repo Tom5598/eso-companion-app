@@ -17,6 +17,11 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { UserService } from '../../services/user.service';
 import { Notification } from '../../models/notification.model';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { SurveyService } from '../../services/survey.service';
+import { Survey } from '../../models/survey.model';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -25,7 +30,7 @@ import { Notification } from '../../models/notification.model';
     MatButtonModule,
     MatIconModule,
     MatTabsModule,
-    MatListModule],
+    MatListModule, MatSelectModule, MatFormFieldModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
@@ -38,12 +43,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
   defaultPicUrl = '';
   unread$!: Observable<Notification[]>;
   read$!: Observable<Notification[]>;
-  
+  incompleteSurveys$!: Observable<Survey[]>;
   constructor(
     private auth: AuthService,
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
-    private userSvc: UserService
+    private userSvc: UserService,
+    private surveySvc: SurveyService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -69,6 +76,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
       switchMap(u => u ? this.userSvc.getNotifications(u.uid) : of([])),
       map(arr => arr.filter(n => n.read))
     );
+    this.incompleteSurveys$ = this.auth.getCurrentUser().pipe(
+      switchMap(u => (u ? this.surveySvc.getIncomplete(u.uid) : of([])))
+    );
   }
   loadUserData(uid: string) {
     //Load the user's data from
@@ -79,6 +89,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
       .subscribe((data) => {
         this.userData = data;
       });
+  }
+  onSelectSurvey(surveyId: string) {
+    this.router.navigate(['/survey', surveyId]);
   }
    /** Dismiss moves it to “read” */
    dismiss(n: Notification) {    
