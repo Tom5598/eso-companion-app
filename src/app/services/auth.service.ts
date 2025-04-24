@@ -27,6 +27,15 @@ export class AuthService {
     );
   }
   
+  resetPassword(email: string): Observable<void> {
+    return from(this.afAuth.sendPasswordResetEmail(email,
+      {
+      url: 'http://localhost:4200/reset-password', 
+      handleCodeInApp: true
+      }
+  ));
+  }
+
   register(email: string, password: string, username: string): Observable<any> {
     return from(
       this.afAuth

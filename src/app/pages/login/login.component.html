@@ -1,4 +1,4 @@
-<mat-card class="login-container" >
+<mat-card class="login-container">
   <h2>Login</h2>
   <form (ngSubmit)="onLogin()" #loginForm="ngForm">
     <mat-form-field appearance="fill">
@@ -26,14 +26,24 @@
       Login
     </button>
   </form>
+  <br>
   <button
-  mat-raised-button
-  color="accent"
-  type="button"
-  (click)="onGoogleSignIn()"
->
-  Sign in with Google
-</button>
+    mat-raised-button
+    color="accent"
+    type="button"
+    (click)="onGoogleSignIn()"
+  >
+    Sign in with Google
+  </button>
+  <br>
+  <button
+    mat-raised-button
+    color="accent"
+    type="button"
+    (click)="onResetPassword()"
+  >
+    Forgot Password?
+  </button>
 
   <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
 </mat-card>

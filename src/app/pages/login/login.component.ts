@@ -46,4 +46,8 @@ export class LoginComponent {
       error: err => this.errorMessage = err.message
     });
   }
+  onResetPassword() {
+    this.router.navigate(['/reset-password']);
+  }
+  
 }

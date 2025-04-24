@@ -12,6 +12,8 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { PostExistsGuard } from './guards/post-exist.guard';
 import { SurveyComponent } from './pages/survey/survey.component';
 import { SurveyGuard } from './guards/survey.guard';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { ResetPasswordConfirmComponent } from './components/reset-password-confirm/reset-password-confirm.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -23,6 +25,11 @@ export const routes: Routes = [
     { path: 'home', component: HomeComponent },
     { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
     { path: 'survey/:surveyId', component: SurveyComponent, canActivate: [AuthGuard, SurveyGuard]},
+    { path: 'reset-password', component: ResetPasswordComponent },
+    { path: 'reset-password-confirm', component: ResetPasswordConfirmComponent },
+
+
+
     { path: 'not-found', component: PageNotFoundComponent,   },
     { path: '**', component: PageNotFoundComponent,  },
     {path: '', redirectTo: 'home', pathMatch: 'full'},
