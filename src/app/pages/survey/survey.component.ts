@@ -40,7 +40,7 @@ export class SurveyComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('surveyId')!;
     this.auth.getCurrentUser()
-      .pipe(switchMap(u => (u ? this.surveySvc.getOne(u.uid, id) : of(undefined))))
+      .pipe(switchMap(u => (u ? this.surveySvc.getOne(id) : of(undefined))))
       .subscribe(s => {
         if (!s) {
           this.router.navigate(['/profile']);
@@ -68,7 +68,7 @@ export class SurveyComponent implements OnInit {
     if (!this.survey) return;
     this.auth
       .getCurrentUser()
-      .pipe(switchMap(u => (u ? this.surveySvc.submitSurvey(u.uid, this.survey!.id, this.responses) : of(null))))
+      .pipe(switchMap(u => (u ? this.surveySvc.submit(u.uid, this.survey!.id, this.responses) : of(null))))
       .subscribe(() => this.router.navigate(['/profile']));
   }
 

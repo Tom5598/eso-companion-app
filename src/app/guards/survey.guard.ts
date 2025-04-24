@@ -16,17 +16,15 @@ export class SurveyGuard implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
     const surveyId = route.paramMap.get('surveyId')!;
     return this.auth.getCurrentUser().pipe(
-      switchMap((u) => {
+      switchMap(u => {
         if (!u) {
           this.router.navigate(['/login']);
           return of(false);
         }
-        return this.surveySvc.getOne(u.uid, surveyId).pipe(
+        return this.surveySvc.getUserAnswers(u.uid).pipe(
           take(1),
-          map((s) => !!s && s.completed === false),
-          tap((ok) => {
-            if (!ok) this.router.navigate(['/profile']);
-          })
+          map(doc => !!doc ? !doc.entries[surveyId]?.completed : true),
+          tap(ok => { if (!ok) this.router.navigate(['/profile']); })
         );
       })
     );

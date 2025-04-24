@@ -1,71 +1,66 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AuthService } from './auth.service';
-import { Survey } from '../models/survey.model';
+import { Survey, SurveyAnswerEntry, SurveyDefinition, UserSurveyAnswers } from '../models/survey.model';
 import { from, Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class SurveyService {
+  private readonly DOC_ID = 'responses';
   constructor(
     private afs: AngularFirestore,
     private auth: AuthService
   ) {}
-
-  /** All surveys for the given user */
-  getAll(uid: string): Observable<Survey[]> {
+  getAll(): Observable<SurveyDefinition[]> {
     return this.afs
-      .collection<Survey>(`users/${uid}/surveys`, ref =>
-        ref.orderBy('createdAt', 'desc')
-      )
+      .collection<SurveyDefinition>('surveys', ref => ref.orderBy('createdAt', 'desc'))
       .valueChanges({ idField: 'id' })
       .pipe(
-        map(arr =>
-          arr.map(s => ({
-            ...s,
-            createdAt: (s.createdAt as any).toDate(), completedAt: s.completedAt ? (s.completedAt as any).toDate() : undefined
-          }))
-        )
+        map(arr => arr.map(s => ({ ...s, createdAt: (s.createdAt as any).toDate() })))
       );
   }
 
-  /** Only surveys with completed == false */
-  getIncomplete(uid: string): Observable<Survey[]> {
+  getOne(id: string): Observable<SurveyDefinition | undefined> {
     return this.afs
-      .collection<Survey>(`users/${uid}/surveys`, ref =>
-        ref.where('completed', '==', false)
-      )
+      .doc<SurveyDefinition>(`surveys/${id}`)
       .valueChanges({ idField: 'id' })
       .pipe(
-        map(arr =>
-          arr.map(s => ({
-            ...s,
-            createdAt: (s.createdAt as any).toDate()
-          }))
-        )
+        map(s => s ? { ...s, createdAt: (s.createdAt as any).toDate() } : undefined)
       );
   }
 
-  /** Single survey by ID */
-  getOne(uid: string, surveyId: string): Observable<Survey | undefined> {
+  getUserAnswers(uid: string): Observable<UserSurveyAnswers | null> {
     return this.afs
-      .doc<Survey>(`users/${uid}/surveys/${surveyId}`)
+      .doc<UserSurveyAnswers>(`users/${uid}/surveyanswers/${this.DOC_ID}`)
       .valueChanges({ idField: 'id' })
       .pipe(
-        map(s =>
-          s ? { ...s, createdAt: (s.createdAt as any).toDate(), completedAt: s.completedAt ? (s.completedAt as any).toDate() : undefined } : undefined
-        )
+        map(doc => {
+          if (!doc) return null;
+          const entries: Record<string, SurveyAnswerEntry> = {};
+          for (const [sid, e] of Object.entries(doc.entries || {})) {
+            entries[sid] = {
+              completed: e.completed,
+              completedAt: (e.completedAt as any).toDate(),
+              responses: e.responses
+            };
+          }
+          return { id: doc.id, entries };
+        })
       );
   }
-  /** Submit survey responses and mark as completed */
-  submitSurvey(uid: string, surveyId: string, responses: number[]): Observable<void> {
-    const docRef = this.afs.doc(`users/${uid}/surveys/${surveyId}`);
-    return from(
-      docRef.update({
-        completed: true,
-        completedAt: new Date(),
-        responses
-      })
-    );
+
+  submit(uid: string, surveyId: string, responses: number[]): Observable<void> {
+    const docRef = this.afs.doc(`users/${uid}/surveyanswers/${this.DOC_ID}`);
+    const payload = {
+      entries: {
+        [surveyId]: {
+          completed: true,
+          completedAt: new Date(),
+          responses
+        }
+      }
+    };
+    return from(docRef.set(payload, { merge: true }));
   }
 }

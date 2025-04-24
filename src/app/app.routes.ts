@@ -22,7 +22,7 @@ export const routes: Routes = [
     { path: 'forum/:id', component :PostDetailComponent, canActivate: [PostExistsGuard] },     
     { path: 'home', component: HomeComponent },
     { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
-    { path: 'survey/:surveyId', component: SurveyComponent, canActivate: [SurveyGuard]},
+    { path: 'survey/:surveyId', component: SurveyComponent, canActivate: [AuthGuard, SurveyGuard]},
     { path: 'not-found', component: PageNotFoundComponent,   },
     { path: '**', component: PageNotFoundComponent,  },
     {path: '', redirectTo: 'home', pathMatch: 'full'},

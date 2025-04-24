@@ -6,7 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 // RxJS
-import { Subscription, switchMap, finalize, Observable, map, of } from 'rxjs';
+import { Subscription, switchMap, finalize, Observable, map, of, combineLatest } from 'rxjs';
 
 
 // Angular
@@ -55,6 +55,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     //Gets  loggedin user
+    
     this.authSub = this.auth
       .getCurrentUser()
       .subscribe((currentUser) => {
@@ -67,6 +68,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       .subscribe(url => {
         this.defaultPicUrl = url;
       });
+      
       // 3) load notifications streams
     this.unread$ = this.auth.getCurrentUser().pipe(
       switchMap(u => u ? this.userSvc.getNotifications(u.uid) : of([])),
@@ -76,9 +78,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
       switchMap(u => u ? this.userSvc.getNotifications(u.uid) : of([])),
       map(arr => arr.filter(n => n.read))
     );
-    this.incompleteSurveys$ = this.auth.getCurrentUser().pipe(
-      switchMap(u => (u ? this.surveySvc.getIncomplete(u.uid) : of([])))
-    );
+    
+    
+    
+    
   }
   loadUserData(uid: string) {
     //Load the user's data from
@@ -88,7 +91,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
       .valueChanges()
       .subscribe((data) => {
         this.userData = data;
+        
+        
       });
+      this.incompleteSurveys$ = combineLatest([
+        this.surveySvc.getAll(),
+        this.surveySvc.getUserAnswers(uid)
+      ]).pipe(
+        map(([defs, doc]) =>
+          defs.filter(d => !(doc && doc.entries[d.id]?.completed))
+        )
+      );
   }
   onSelectSurvey(surveyId: string) {
     this.router.navigate(['/survey', surveyId]);
