@@ -1,5 +1,13 @@
 {
   "projects": {
     "default": "eso-companion-app-89474"
+  },
+  "targets": {},
+  "etags": {
+    "eso-companion-app-89474": {
+      "extensionInstances": {
+        "firestore-send-email-b0nx": "a27a4d1d567756ccf0e2fe96ff6b8fce3d787c78f3896b0eca2bb79bfbd576e3"
+      }
+    }
   }
 }
