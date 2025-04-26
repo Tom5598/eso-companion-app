@@ -1,0 +1,55 @@
+.survey-mgmt-card {
+  max-width: 700px;
+  margin: 1.5rem auto;
+  padding: 1rem;
+}
+
+.survey-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.question-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.question-field {
+  flex: 1;
+}
+
+.buttons-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+mat-list-item {
+  min-height: 75px;
+}
+.hidden-survey {
+  color: #f44336;
+  font-style: italic;
+  margin-left: 0.5rem;
+}
+@media (max-width: 600px) {
+  .survey-mgmt-card {
+    margin: 1rem;
+    padding: 0.5rem;
+  }
+  .buttons-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

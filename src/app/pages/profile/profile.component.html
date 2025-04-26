@@ -30,6 +30,22 @@
     <p><strong>Email:</strong> {{ user?.email }}</p>
     <p><strong>Username:</strong> {{ userData.username }}</p>
   </div> 
+  <mat-form-field appearance="fill" *ngIf="true">
+    <mat-label>Available Surveys</mat-label>
+    <mat-select (selectionChange)="onSelectSurvey($event.value)">
+      <mat-option
+        *ngFor="let s of incompleteSurveys$ | async"
+        [value]="s.id"
+      >
+        {{ s.name  }}
+      </mat-option>
+      <mat-option
+        *ngIf="(incompleteSurveys$ | async)?.length === 0"
+        [disabled]="true"
+        >No survey available</mat-option>
+    </mat-select>
+  </mat-form-field>
+   
   <mat-tab-group class="notifications-tabs">
     <!-- Unread Tab -->
     <mat-tab label="Unread">
@@ -91,15 +107,6 @@
       </div>
     </mat-tab>
   </mat-tab-group>
-  <mat-form-field appearance="fill" *ngIf="(incompleteSurveys$ | async)?.length">
-    <mat-label>Available Surveys</mat-label>
-    <mat-select (selectionChange)="onSelectSurvey($event.value)">
-      <mat-option
-        *ngFor="let s of incompleteSurveys$ | async"
-        [value]="s.id"
-      >
-        {{ s.name  }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+   
+  
 </mat-card>

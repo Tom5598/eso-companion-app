@@ -3,7 +3,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { User } from '../models/user.model';
 import firebase from 'firebase/compat/app'; 
-import { from, Observable, of, switchMap } from 'rxjs';
+import { from, map, Observable, of, switchMap, take, throwError } from 'rxjs';
 import { GoogleAuthProvider } from '@angular/fire/auth';
 @Injectable({
   providedIn: 'root',
@@ -26,7 +26,12 @@ export class AuthService {
       switchMap(user => of(user ?? null)) // Ensure undefined is replaced with null
     );
   }
-  
+  isAdmin$(): Observable<boolean> {
+    return this.afAuth.authState.pipe(
+      switchMap(u => u ? from(u.getIdTokenResult()) : of(null)),
+      map(res => !!res?.claims['admin'])
+    );
+  }
   resetPassword(email: string): Observable<void> {
     return from(this.afAuth.sendPasswordResetEmail(email));
   }
@@ -42,6 +47,7 @@ export class AuthService {
               uid,
               email,
               username,
+              disabled: false,
               createdAt: new Date(),
               photoURL: 'https://firebasestorage.googleapis.com/v0/b/eso-companion-app-89474.firebasestorage.app/o/shared%2Fprofile_default.png?alt=media&token=3179657a-a62a-4ad7-b634-316a8a666f7c',
             };
@@ -52,31 +58,68 @@ export class AuthService {
         .catch((error) => {})
     );
   }
-  googleSignIn(): Observable<any> {
-    const provider = new GoogleAuthProvider();                // ← instantiate here
-    return from(
-      this.afAuth.signInWithPopup(provider)
-        .then((credential) => {
-          const fbUser = credential.user;
-          if (!fbUser) return;
-          const uid = fbUser.uid;
-          const userData: User = {
-            uid,
-            email: fbUser.email!,
-            username: fbUser.displayName || '',
-            photoURL: fbUser.photoURL || '',
-            createdAt: new Date()
-          };
-          // merge: true so we don’t overwrite custom fields if user already exists
-          return this.firestore
-            .doc(`users/${uid}`)
-            .set(userData, { merge: true });
-        })
+  /** Google popup login with disabled-check */
+  googleSignIn(): Observable<firebase.auth.UserCredential> {
+    const provider = new GoogleAuthProvider();
+    return from(this.afAuth.signInWithPopup(provider)).pipe(
+      switchMap(cred => {
+        const fbUser = cred.user!;
+        const uid = fbUser.uid;
+        const ref = this.firestore.doc<User>(`users/${uid}`);
+        // first, get existing doc to check disabled flag
+        return from(ref.ref.get()).pipe(
+          switchMap(snapshot => {
+            const exists = snapshot.exists;
+            const data = snapshot.data() as User | undefined;
+            const wasDisabled = data?.disabled === true;
+            // prepare merge data
+            const userData: User = {
+              uid,
+              email: fbUser.email || '',
+              username: fbUser.displayName || '',
+              photoURL: fbUser.photoURL || '',
+              createdAt: exists ? data!.createdAt : new Date(),
+              disabled: exists ? data!.disabled : false
+            };
+            // write/update doc (preserves disabled if existed)
+            return from(ref.set(userData, { merge: true })).pipe(
+              switchMap(() => {
+                if (wasDisabled) {
+                  return from(this.afAuth.signOut()).pipe(
+                    switchMap(() => throwError(() => new Error('Your account has been disabled.')))
+                  );
+                }
+                return of(cred);
+              })
+            );
+          })
+        );
+      })
     );
   }
-  login(email: string, password: string): Observable<any> {
-    return from(this.afAuth.signInWithEmailAndPassword(email, password));
+  /** Email/password login with disabled-check */
+  login(email: string, password: string): Observable<firebase.auth.UserCredential> {
+    return from(this.afAuth.signInWithEmailAndPassword(email, password)).pipe(
+      switchMap(cred => {
+        const uid = cred.user!.uid;
+        // fetch the user doc once
+        return this.firestore.doc<User>(`users/${uid}`).valueChanges().pipe(
+          take(1),
+          switchMap(userData => {
+            if (userData?.disabled) {
+              // user is disabled → sign out and error
+              return from(this.afAuth.signOut()).pipe(
+                switchMap(() => throwError(() => new Error('Your account has been disabled.')))
+              );
+            }
+            // ok
+            return of(cred);
+          })
+        );
+      })
+    );
   }
+  
   logout(): Observable<void> {
     return from(this.afAuth.signOut());
   }

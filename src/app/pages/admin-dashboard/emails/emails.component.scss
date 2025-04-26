@@ -1,0 +1,30 @@
+.email-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+button {
+  align-self: flex-end;
+}
+
+@media (max-width: 480px) {
+  .email-container {
+    margin: 1rem;
+    padding: 0.5rem;
+  }
+  button {
+    width: 100%;
+  }
+}

@@ -1,4 +1,10 @@
-import { Component, OnInit, OnDestroy,ViewChild,  ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // Angular Material
@@ -6,12 +12,19 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 // RxJS
-import { Subscription, switchMap, finalize, Observable, map, of, combineLatest } from 'rxjs';
-
+import {
+  Subscription,
+  switchMap,
+  finalize,
+  Observable,
+  map,
+  of,
+  combineLatest,
+} from 'rxjs';
 
 // Angular
-import { MatTabsModule }   from '@angular/material/tabs';
-import { MatListModule }   from '@angular/material/list';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatListModule } from '@angular/material/list';
 import { AuthService } from '../../services/auth.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
@@ -25,12 +38,16 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule,
+  imports: [
+    CommonModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatTabsModule,
-    MatListModule, MatSelectModule, MatFormFieldModule],
+    MatListModule,
+    MatSelectModule,
+    MatFormFieldModule,
+  ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
@@ -55,33 +72,29 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     //Gets  loggedin user
-    
-    this.authSub = this.auth
-      .getCurrentUser()
-      .subscribe((currentUser) => {
-        this.user = currentUser;
-        if (this.user) {
-          this.loadUserData(this.user.uid);
-        }
-      });
-      this.storage.ref('shared/profile_default.png').getDownloadURL()
-      .subscribe(url => {
+
+    this.authSub = this.auth.getCurrentUser().subscribe((currentUser) => {
+      this.user = currentUser;
+      if (this.user) {
+        this.loadUserData(this.user.uid);
+      }
+    });
+    this.storage
+      .ref('shared/profile_default.png')
+      .getDownloadURL()
+      .subscribe((url) => {
         this.defaultPicUrl = url;
       });
-      
-      // 3) load notifications streams
+
+    // 3) load notifications streams
     this.unread$ = this.auth.getCurrentUser().pipe(
-      switchMap(u => u ? this.userSvc.getNotifications(u.uid) : of([])),
-      map(arr => arr.filter((n ) => !n.read))
+      switchMap((u) => (u ? this.userSvc.getNotifications(u.uid) : of([]))),
+      map((arr) => arr.filter((n) => !n.read))
     );
     this.read$ = this.auth.getCurrentUser().pipe(
-      switchMap(u => u ? this.userSvc.getNotifications(u.uid) : of([])),
-      map(arr => arr.filter(n => n.read))
+      switchMap((u) => (u ? this.userSvc.getNotifications(u.uid) : of([]))),
+      map((arr) => arr.filter((n) => n.read))
     );
-    
-    
-    
-    
   }
   loadUserData(uid: string) {
     //Load the user's data from
@@ -91,23 +104,21 @@ export class ProfileComponent implements OnInit, OnDestroy {
       .valueChanges()
       .subscribe((data) => {
         this.userData = data;
-        
-        
       });
-      this.incompleteSurveys$ = combineLatest([
-        this.surveySvc.getAll(),
-        this.surveySvc.getUserAnswers(uid)
-      ]).pipe(
-        map(([defs, doc]) =>
-          defs.filter(d => !(doc && doc.entries[d.id]?.completed))
-        )
-      );
+    this.incompleteSurveys$ = combineLatest([
+      this.surveySvc.getVisibleDefinitions(),
+      this.surveySvc.getUserAnswers(uid),
+    ]).pipe(
+      map(([defs, doc]) =>
+        defs.filter((d) => !(doc && doc.entries[d.id]?.completed))
+      )
+    );
   }
   onSelectSurvey(surveyId: string) {
     this.router.navigate(['/survey', surveyId]);
   }
-   /** Dismiss moves it to “read” */
-   dismiss(n: Notification) {    
+  /** Dismiss moves it to “read” */
+  dismiss(n: Notification) {
     if (!this.user) return;
     this.userSvc.markAsRead(this.userData.uid, n.id);
   }

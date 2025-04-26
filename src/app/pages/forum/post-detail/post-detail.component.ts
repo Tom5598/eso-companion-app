@@ -68,7 +68,7 @@ type Token = { type: 'text' | 'commodity'; value: string , link : string};
   templateUrl: './post-detail.component.html',
   styleUrl: './post-detail.component.scss',
 })
-export class PostDetailComponent implements OnInit { 
+export class PostDetailComponent implements OnInit {
   postId!: string;
   post$: Observable<Post> = new Observable<Post>();
   comments$: Observable<Comment[]> = new Observable<Comment[]>();
@@ -76,9 +76,10 @@ export class PostDetailComponent implements OnInit {
   isLiked$!: Observable<boolean>;
   currentUserId: string | null = null;
   loadedMap: Record<string, boolean> = {};
-  //parsing tokens for mentions
+  isLocked!: boolean;
   contentTokens: {type: 'text' | 'commodity'; value: string; link?: string}[] = [];
-
+  isAdmin$!: Observable<boolean> ;
+  isAdmin: boolean = false;
   @Output()
   postEdited = new EventEmitter<Post>();
   @Output()
@@ -96,7 +97,7 @@ export class PostDetailComponent implements OnInit {
 
   async ngOnInit() {
     this.postId = this.route.snapshot.paramMap.get('id')!;
-
+    this.isAdmin$ = this.auth.isAdmin$();
     // 1) Grab your name→link list exactly once
     const names$: Observable<CommodityNames[]> =
       this.commoditySvc
@@ -115,7 +116,7 @@ export class PostDetailComponent implements OnInit {
           this.router.navigate(['/not-found']);
           return;
         }
-
+        this.isLocked=post.isLocked;
         // build quick lookup: { "wood": "/market/wood-id", ... }
         const lookup: Record<string,string> = {};
         for (const n of names) {
@@ -142,7 +143,12 @@ export class PostDetailComponent implements OnInit {
           .pipe(map((ids) => ids.includes(this.postId)));
       } else {
         this.isLiked$ = of(false);
-      }
+      } 
+      this.isAdmin$.pipe(take(1)).subscribe((isAdmin) => {
+        this.isAdmin = isAdmin;}
+      );
+      
+      
     });
     this.post$.subscribe((post) => {
       // reset all to false whenever the post changes
@@ -152,9 +158,9 @@ export class PostDetailComponent implements OnInit {
       );
     });
   }
-  count = 0;
+  
   private tokenize(text: string, lookup: Record<string, string>): Token[] {
-    this.count++;
+    
     // split on $word tokens
     const parts = text.split(/(\$[A-Za-z]+)/g);
     return parts.map((p) => {
@@ -163,8 +169,6 @@ export class PostDetailComponent implements OnInit {
         const name = m[1];
         const link = lookup[name.toLowerCase()];
         if (link) {
-          console.log('count:',this.count,`Found commodity: ${name} → ${link}`);
-          
           return { type: 'commodity', value: name, link: link };
         }
       }
@@ -182,6 +186,10 @@ export class PostDetailComponent implements OnInit {
   }
 
   openEditPost(postEdit: Post) {
+    if( this.isLocked) {
+      this.snackBar.open('Post is locked', 'Dismiss', { duration: 3000 });
+      return;
+    }
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
@@ -207,8 +215,12 @@ export class PostDetailComponent implements OnInit {
         }
       });
   }
-
+ 
   openComment() {
+    if( this.isLocked) {
+      this.snackBar.open('Post is locked', 'Dismiss', { duration: 3000 });
+      return;
+    }
     const id = this.postId!;
     this.bottomSheet.open(CommentCreateComponent, {
       data: { postId: id },
@@ -217,6 +229,10 @@ export class PostDetailComponent implements OnInit {
 
   toggleLike() {
     if (!this.currentUserId) return;
+    if( this.isLocked) {
+      this.snackBar.open('Post is locked', 'Dismiss', { duration: 3000 });
+      return;
+    }
     this.forum.toggleLike(this.postId, this.currentUserId).subscribe(); // transaction updates both docs for you
   }
   share() {
@@ -236,6 +252,20 @@ export class PostDetailComponent implements OnInit {
         });
       });
   }
+  onToggleLockPost(postID: string) {
+    return this.forum.toggleLockPost(postID, this.isLocked).subscribe({
+      next: () => {
+        this.snackBar.open('Post lock toggled', 'Dismiss', { duration: 3000 });
+        this.router.navigate(['/forum']);
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.snackBar.open('Could not toggle lock on post', 'Dismiss', {
+          duration: 3000,
+        });
+      },
+    });
+  } 
   onDeletePost(postId: string) {
     if (!confirm('Delete this post? This cannot be undone.')) return;
     this.forum.deletePost(postId).subscribe({

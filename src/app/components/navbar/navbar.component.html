@@ -1,6 +1,6 @@
 <mat-toolbar color="primary" class="navbar-container">
   <!-- Logo / Home -->
-  <button mat-button routerLink="/home"><mat-icon>home</mat-icon> Home</button>
+  <button mat-button routerLink="/home"><mat-icon>home</mat-icon></button>
   <!-- Forum -->
   <button mat-button routerLink="/forum">
     <mat-icon>forum</mat-icon> Forum
@@ -9,6 +9,7 @@
   <!-- Only show our profile menu when logged in -->
   <app-profile-menu *ngIf="isLoggedIn"></app-profile-menu>
   <!-- If NOT logged in, show login/register -->
+  
   <button mat-button routerLink="/login" *ngIf="!isLoggedIn">
     <mat-icon>login</mat-icon> Login
   </button>

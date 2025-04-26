@@ -1,0 +1,29 @@
+<mat-card class="email-container">
+  <h2>Send Bulk Email</h2>
+  <form [formGroup]="emailForm" (ngSubmit)="send()" class="email-form">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Subject</mat-label>
+      <input matInput formControlName="subject" />
+      <mat-error *ngIf="emailForm.get('subject')?.hasError('required')">
+        Subject is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Body (HTML allowed)</mat-label>
+      <textarea matInput formControlName="body" rows="6"></textarea>
+      <mat-error *ngIf="emailForm.get('body')?.hasError('required')">
+        Message body is required
+      </mat-error>
+    </mat-form-field>
+
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="emailForm.invalid"
+    >
+      Send to All Users
+    </button>
+  </form>
+</mat-card>

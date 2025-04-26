@@ -1,0 +1,29 @@
+<ng-container *ngIf="article$ | async as article">
+  <mat-card class="detail-card">
+    <mat-card-header>
+      <mat-card-title>{{ article.title }}</mat-card-title>
+      <mat-card-subtitle>{{
+        article.createdAt | date : "mediumDate"
+      }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content>
+      <ng-container *ngFor="let blk of article.blocks">
+        <p *ngIf="blk.type === 'text'">{{ blk.text }}</p>
+        <img
+          *ngIf="blk.type === 'image'"
+          [src]="blk.url"
+          class="detail-image"
+        />
+      </ng-container>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>Back
+      </button>
+      <button *ngIf="(isAdmin$|async)" mat-raised-button color="warn"  (click)="deleteArticle(article.id)" >Delete Article!</button>
+    </mat-card-actions>
+  </mat-card>
+</ng-container>

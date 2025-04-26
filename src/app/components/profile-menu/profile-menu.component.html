@@ -7,15 +7,23 @@
       [src]="user.photoURL"
       alt="Profile"
       class="avatar"
-      matTooltip="Profile"
+      matTooltip="User:{{user.username}}"
       (click)="goToProfile()"
       [matTooltipPosition]="'above'"
       matTooltipHideDelay="200"
     />
 
     <!-- Username -->
-    <span class="username">{{ user.username }}</span>
-
+    <span class="username"></span>
+    <button mat-button *ngIf="isAdmin$ | async"
+      aria-label="Admin Dashboard"
+      matTooltip="Admin Dashboard"
+      [matTooltipPosition]="'above'"
+      matTooltipHideDelay="200"
+      (click)="goToAdminDashboard()"
+    >
+      <mat-icon color="primary">terminal</mat-icon> 
+    </button>
     <!-- Notifications -->
     <button
       mat-icon-button
@@ -33,6 +41,7 @@
       matBadgeOverlap="true"
       matBadgePosition="after" 
       matBadgeSize="medium"
+      aria-hidden="false"
       >notifications</mat-icon>
     </button>
 

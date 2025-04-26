@@ -23,15 +23,7 @@ getCommodityNames(): Observable<CommodityNames[]> {
       map(doc => doc?.commodityNames ?? [])
     );
 }
-getCommodityNamesss(): Observable<string[]> {
-  return this.afs
-    .doc<{ commodityNames: string[] }>('utils/misc')
-    .valueChanges()
-    .pipe(
-      map(doc => doc?.commodityNames ?? []),
-      tap( names => {console.log('Commodity names:', names); }),       
-  );
-}
+ 
 
 // Fetch one commodity by name
 getCommodityByName(name: string): Observable<Commodity> {

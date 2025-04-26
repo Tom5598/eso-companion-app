@@ -1,0 +1,41 @@
+.home-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0 1rem;
+}
+
+.article-card {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.article-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.thumbnail {
+  height: 200px;
+  object-fit: cover;
+}
+
+.snippet {
+  color: rgba(0, 0, 0, 0.7);
+  margin: 1rem 0;
+  line-height: 1.4;
+  max-height: 4.2em; /* approx 3 lines */
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  .thumbnail {
+    height: 150px;
+  }
+  .home-container {
+    margin: 1rem auto;
+  }
+}

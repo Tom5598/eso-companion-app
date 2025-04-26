@@ -4,4 +4,5 @@ export interface User {
   username: string;
   createdAt: Date;
   photoURL?: string;
+  disabled?: boolean;
 }

@@ -15,13 +15,14 @@ import { ForumService } from '../../../services/forum.service';
 import { AuthService } from '../../../services/auth.service';
 import { take, switchMap } from 'rxjs/operators';
 import { MatButton, MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-comment-create',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
+    ReactiveFormsModule, MatInputModule,
     MatBottomSheetModule, MatButtonModule
   ],
   templateUrl: './comment-create.component.html',

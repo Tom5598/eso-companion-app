@@ -20,12 +20,7 @@
             {{ t.value }}
           </ng-container>
           <ng-container *ngIf="t.type === 'commodity'">
-            <a
-              class="commodity-link" 
-              [href]="[t.link]"
-            >
-              ${{ t.value }}
-            </a>
+            <a class="commodity-link" [href]="[t.link]"> ${{ t.value }} </a>
           </ng-container>
         </ng-container>
       </p>
@@ -35,17 +30,17 @@
     <div class="pictures" *ngIf="post.linkedPictures?.length">
       <div class="picture-wrapper" *ngFor="let url of post.linkedPictures">
         <img
-              [src]="url"
-              (load)="onImageLoad(url)"
-              class="linked-pic"
-              [class.hidden]="!loadedMap[url]"
-              alt="Post image"
-            />
-        
-            <!-- Spinner on top until the image has loaded -->
-            <div *ngIf="!loadedMap[url]" class="overlay-spinner">
-              <app-loading-indicator></app-loading-indicator>
-            </div>
+          [src]="url"
+          (load)="onImageLoad(url)"
+          class="linked-pic"
+          [class.hidden]="!loadedMap[url]"
+          alt="Post image"
+        />
+
+        <!-- Spinner on top until the image has loaded -->
+        <div *ngIf="!loadedMap[url]" class="overlay-spinner">
+          <app-loading-indicator></app-loading-indicator>
+        </div>
       </div>
     </div>
     <br />
@@ -56,7 +51,7 @@
     </div>
     <!-- Actions -->
     <mat-card-actions>
-      @if (currentUserId$) {
+      @if (currentUserId$ ) {
       <button
         mat-button
         [disabled]="post.isLocked"
@@ -111,22 +106,31 @@
         Delete
       </button>
       }
+      @if (isAdmin) {
+      <button mat-button color="warn" (click)="onDeletePost(post.id)">
+        Delete
+      </button>
+      <button mat-button color="warn" (click)="onToggleLockPost(post.id)">
+        <mat-icon color="warn">{{ isLocked ? "lock_open" : "lock" }}</mat-icon
+        >{{ isLocked ? "Unlock Post" : "Lock Post" }}
+      </button>
+      }
     </mat-card-actions>
-  </mat-card> 
+  </mat-card>
   <!-- Comments List -->
   <div class="comments" *ngIf="comments$ | async as comments">
     <mat-card class="comment" *ngFor="let c of comments">
       <mat-card-subtitle>
         {{ c.username }} {{ c.createdAt | toDate | date : "short" }}
         <button
-         *ngIf="currentUserId === c.authorId"
-         mat-icon-button
-         color="warn"
-         (click)="onDeleteComment(c.id)"
-         matTooltip="Delete comment"
-       >
-         <mat-icon>delete</mat-icon>
-       </button>
+          *ngIf="currentUserId === c.authorId"
+          mat-icon-button
+          color="warn"
+          (click)="onDeleteComment(c.id)"
+          matTooltip="Delete comment"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
       </mat-card-subtitle>
       <mat-card-content>{{ c.content }}</mat-card-content>
     </mat-card>

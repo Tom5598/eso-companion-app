@@ -14,23 +14,59 @@ import { SurveyComponent } from './pages/survey/survey.component';
 import { SurveyGuard } from './guards/survey.guard';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { ResetPasswordConfirmComponent } from './components/reset-password-confirm/reset-password-confirm.component';
+import { AdminGuard } from './guards/admin.guard';
+import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
+import { SurveyManagementComponent } from './pages/admin-dashboard/survey-management/survey-management.component';
+import { ArticlesComponent } from './pages/admin-dashboard/articles/articles.component';
+import { EmailsComponent } from './pages/admin-dashboard/emails/emails.component';
+import { UsersComponent } from './pages/admin-dashboard/users/users.component';
+import { StatisticsComponent } from './pages/admin-dashboard/statistics/statistics.component';
+import { ArticleDetailComponent } from './components/article-detail/article-detail.component';
 
 export const routes: Routes = [
-    { path: 'login', component: LoginComponent },
-    { path: 'register', component: RegisterComponent },
-    { path: 'forum', component: ForumComponent },
-    { path: 'forum/post-edit/:id',component: PostEditComponent, canActivate: [AuthGuard,PostExistsGuard] },
-    { path : 'forum/post-create', component: PostCreateComponent, canActivate: [AuthGuard]},
-    { path: 'forum/:id', component :PostDetailComponent, canActivate: [PostExistsGuard] },     
-    { path: 'home', component: HomeComponent },
-    { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
-    { path: 'survey/:surveyId', component: SurveyComponent, canActivate: [AuthGuard, SurveyGuard]},
-    { path: 'reset-password', component: ResetPasswordComponent },
-    { path: 'reset-password-confirm', component: ResetPasswordConfirmComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'home', component: HomeComponent },
+  { path: 'forum', component: ForumComponent },
+  {
+    path: 'forum/post-edit/:id',
+    component: PostEditComponent,
+    canActivate: [AuthGuard, PostExistsGuard],
+  },
+  {
+    path: 'forum/post-create',
+    component: PostCreateComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'forum/:id',
+    component: PostDetailComponent,
+    canActivate: [PostExistsGuard],
+  },
 
-
-
-    { path: 'not-found', component: PageNotFoundComponent,   },
-    { path: '**', component: PageNotFoundComponent,  },
-    {path: '', redirectTo: 'home', pathMatch: 'full'},
+  { path: 'articles/:id', component: ArticleDetailComponent },
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+  {
+    path: 'survey/:surveyId',
+    component: SurveyComponent,
+    canActivate: [AuthGuard, SurveyGuard],
+  },
+  { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'reset-password-confirm', component: ResetPasswordConfirmComponent },
+  {
+    path: 'admin',
+    component: AdminDashboardComponent,
+    canActivate: [AdminGuard],
+    children: [
+      { path: 'survey', component: SurveyManagementComponent },
+      { path: 'articles', component: ArticlesComponent },
+      { path: 'emails', component: EmailsComponent },
+      { path: 'users', component: UsersComponent },
+      { path: 'statistics', component: StatisticsComponent },
+      { path: '', redirectTo: 'admin', pathMatch: 'full' },
+    ],
+  },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: 'not-found', component: PageNotFoundComponent },
+  { path: '**', component: PageNotFoundComponent },
 ];

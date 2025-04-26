@@ -1,0 +1,35 @@
+<div class="users-container">
+  <mat-form-field appearance="fill" class="search-field">
+    <mat-label>Search users</mat-label>
+    <input
+      matInput
+      [formControl]="searchControl"
+      placeholder="Username prefix"
+    />
+    <mat-progress-spinner
+      matSuffix
+      *ngIf="isLoading"
+      mode="indeterminate"
+      diameter="20">
+    </mat-progress-spinner>
+     
+    <mat-icon matSuffix *ngIf="!isLoading">search</mat-icon>
+  </mat-form-field>
+
+  <mat-list>
+    <mat-list-item *ngFor="let u of users$ | async"  >
+      <span class="username">• {{ u.username }}</span>
+      <button
+        mat-icon-button
+        [color]="u.disabled ? 'primary' : 'warn'"
+        (click)="toggleUser(u)"
+        [matTooltip]="u.disabled ? 'Enable user' : 'Disable user'"
+      >
+        <mat-icon>{{ u.disabled ? "check_circle" : "block" }}</mat-icon>
+      </button>
+    </mat-list-item>
+    <p *ngIf="(users$ | async)?.length === 0" class="no-users">
+      No users found.
+    </p>
+  </mat-list>
+</div>

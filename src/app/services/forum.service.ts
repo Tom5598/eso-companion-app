@@ -29,6 +29,7 @@ import { Notification } from '../models/notification.model';
   providedIn: 'root',
 })
 export class ForumService {
+  
   constructor(
     private afs: AngularFirestore,
     private storage: AngularFireStorage
@@ -104,25 +105,7 @@ export class ForumService {
     );
   }
   //CREATE
-  createForumPost(newPost: Partial<Post>, id?: string) {
-    const post = { ...newPost };
-    let savePost$: Observable<any>;
-    if (id) {
-      savePost$ = from(
-        this.afs.collection('forum').doc(id).set(post, { merge: true })
-      );
-    } else {
-      savePost$ = from(this.afs.collection('forum').add(post));
-    }
-    return savePost$.pipe(
-      map((res) => {
-        return {
-          id: id ?? res.id,
-          ...post,
-        };
-      })
-    );
-  }
+   
   updatePost(postID: string, changes: Partial<Post>): Observable<void> {
     // Use backticks, not a literal string
     const ref = this.afs.doc(`forum/${postID}`);
@@ -212,7 +195,6 @@ export class ForumService {
       likeCount: 0,
       isEdited: false,
       isLocked: false,
-      isHidden: false,
     };
 
     // 2) Write the stub document
@@ -312,5 +294,8 @@ export class ForumService {
         })
       )
     );
+  }
+  toggleLockPost(postID: string, isLocked: boolean): Observable<void> {
+    return from(this.afs.doc(`forum/${postID}`).update({ isLocked: !isLocked }));
   }
 }

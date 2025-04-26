@@ -12,7 +12,6 @@ export interface Post {
     commentCount: number;
     likeCount: number;    
     isEdited: boolean;
-    isLocked: boolean;
-    isHidden: boolean;
+    isLocked: boolean; 
     linkedPictures: Array<string>;
 }

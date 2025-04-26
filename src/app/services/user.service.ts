@@ -6,8 +6,11 @@ import { Notification } from '../models/notification.model';
   providedIn: 'root'
 })
 export class UserService {
+ 
   constructor(private afs: AngularFirestore) {}
-
+  getAllUsers(): any {
+    return this.afs.collection('users').get;
+  }
   /** Stream of all notifications for a user, ordered newest first */
   getNotifications(uid: string): Observable<Notification[]> {
     return this.afs

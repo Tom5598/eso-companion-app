@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import {  Router } from '@angular/router';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 
 @Component({
   selector: 'app-login',
@@ -29,7 +30,7 @@ export class LoginComponent {
 
   constructor(private authService: AuthService, private router:Router) {}
 
-  onLogin() {
+  onLogin() {    
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
         this.router.navigate(['/home']);
