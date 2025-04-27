@@ -10,8 +10,9 @@
 import * as functions from 'firebase-functions/v2';
 import * as admin from 'firebase-admin';
 import { onDocumentCreated } from 'firebase-functions/firestore';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore'; 
 admin.initializeApp();
-
+const db = getFirestore();
 export const httpSetAdmin = functions.https.onRequest(async (req, res) => {
     const uid = 'hVXAybOZyLSRB2VsgVm3y21le3E3';
     if (!uid) {
@@ -69,6 +70,35 @@ export const notifyNewSurvey = onDocumentCreated(
     });
 
     // 3) Commit
+    await batch.commit();
+  }
+);
+
+/**
+ * Triggered whenever a message is published to the
+ * Pub/Sub topic "daily-commodity-update".
+ */
+export const dailyCommodityPubSub = functions.pubsub.onMessagePublished(
+  'daily-commodity-update',
+  async (event) => {
+    const today = new Date();
+    const batch = db.batch();
+    // Fetch all commodity docs
+    const snap = await db.collection('commodities').get();
+    snap.docs.forEach(doc => {
+      const newPrice  = +((Math.random() * 100).toFixed(2));
+      const newVolume = Math.floor(Math.random() * 1000 + 100);
+      const entry = {
+        date: today,
+        price: newPrice,
+        volume: newVolume
+      }; 
+      batch.update(doc.ref, {
+        currentPrice:  newPrice,
+        currentVolume: newVolume,
+        historical:    FieldValue.arrayUnion(entry)
+      });
+    }); 
     await batch.commit();
   }
 );
