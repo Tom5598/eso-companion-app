@@ -11,3 +11,11 @@ export interface Commodity {
   }
   >;
 }
+export interface CommodityFilter {
+  name?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minVolume?: number;
+  maxVolume?: number;
+  limit: number;
+}

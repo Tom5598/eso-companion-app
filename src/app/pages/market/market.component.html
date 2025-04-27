@@ -1,0 +1,49 @@
+<mat-card class="market-filters">
+   
+  <form [formGroup]="form" (ngSubmit)="search()">
+    <div class="filter-row">
+      <mat-form-field appearance="fill">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Min Price</mat-label>
+        <input matInput type="number" formControlName="minPrice" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Max Price</mat-label>
+        <input matInput type="number" formControlName="maxPrice" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Min Volume</mat-label>
+        <input matInput type="number" formControlName="minVolume" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Max Volume</mat-label>
+        <input matInput type="number" formControlName="maxVolume" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Results</mat-label>
+        <mat-select formControlName="limit">
+          <mat-option *ngFor="let opt of resultsOptions" [value]="opt">{{
+            opt
+          }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="submit">Filter</button>
+    </div>
+  </form>
+</mat-card>
+
+<div class="commodity-grid">
+  <app-commodity
+    *ngFor="let c of commodities$ | async"
+    [commodity]="c"
+  ></app-commodity>
+</div>

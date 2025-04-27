@@ -1,0 +1,77 @@
+export interface CommodityNameEntry {
+  link: string;
+  name: string;
+}
+
+// full list of ESO crafting & improvement mats
+const RAW_NAMES = [
+  'Iron Ingot',
+  'Steel Ingot',
+  'Orichalcum Ingot',
+  'Dwarven Ingot',
+  'Ebony Ingot',
+  'Calcinium Ingot',
+  'Galatite Ingot',
+  'Quicksilver Ingot',
+  'Voidstone Ingot',
+  'Rubedite Ingot',
+  'Rawhide',
+  'Hide',
+  'Leather',
+  'Thick Leather',
+  'Fell Hide',
+  'Topgrain Hide',
+  'Iron Hide',
+  'Superb Hide',
+  'Shadowhide',
+  'Rubedo Hide',
+  'Jute',
+  'Flax',
+  'Cotton',
+  'Spidersilk',
+  'Ebonthread',
+  'Kresh Fiber',
+  'Ironthread',
+  'Silverweave',
+  'Void Cloth',
+  'Ancestor Silk',
+  'Sanded Maple',
+  'Sanded Oak',
+  'Sanded Beech',
+  'Sanded Hickory',
+  'Sanded Yew',
+  'Sanded Birch',
+  'Sanded Ash',
+  'Sanded Mahogany',
+  'Sanded Nightwood',
+  'Sanded Ruby Ash',
+  'Pewter Ounce',
+  'Copper Ounce',
+  'Silver Ounce',
+  'Electrum Ounce',
+  'Platinum Ounce',
+  'Honing Stone',
+  'Dwarven Oil',
+  'Grain Solvent',
+  'Tempering Alloy',
+  'Pitch',
+  'Turpen',
+  'Mastic',
+  'Rosin',
+  'Hemming',
+  'Embroidery',
+  'Elegant Lining',
+  'Dreugh Wax',
+  'Terne Plating',
+  'Iridium Plating',
+  'Zircon Plating',
+  'Chromium Plating',
+];
+
+/**
+ * Exported map of commodity names ↔ partial links.
+ */
+export const commodityNames: CommodityNameEntry[] = RAW_NAMES.map((n) => ({
+  link: encodeURIComponent(n),
+  name: n.replace(/\s+/g, ''),
+}));

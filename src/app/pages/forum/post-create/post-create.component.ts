@@ -115,7 +115,7 @@ export class PostCreateComponent implements OnInit {
   
       // look for a matching commodity name (case-insensitive)
       const exists = this.commodityNames.some(
-        c => c?.name.toLowerCase()  === symbol
+        c => c?.name   === symbol
       );
       console.log(`Checking whether "${symbol}" exists...`, exists);      
       if (!exists) {

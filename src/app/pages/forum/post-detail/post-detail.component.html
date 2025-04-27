@@ -20,7 +20,7 @@
             {{ t.value }}
           </ng-container>
           <ng-container *ngIf="t.type === 'commodity'">
-            <a class="commodity-link" [href]="[t.link]"> ${{ t.value }} </a>
+            <a class="commodity-link" (click)="goToCommodity(t.link)"> ${{ t.value }} </a>
           </ng-container>
         </ng-container>
       </p>

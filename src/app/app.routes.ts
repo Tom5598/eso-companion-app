@@ -22,6 +22,9 @@ import { EmailsComponent } from './pages/admin-dashboard/emails/emails.component
 import { UsersComponent } from './pages/admin-dashboard/users/users.component';
 import { StatisticsComponent } from './pages/admin-dashboard/statistics/statistics.component';
 import { ArticleDetailComponent } from './components/article-detail/article-detail.component';
+import { MarketComponent } from './pages/market/market.component';
+import { CommodityComponent } from './pages/market/commodity/commodity.component';
+import { CommodityDetailComponent } from './pages/market/commodity-detail/commodity-detail.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -46,6 +49,8 @@ export const routes: Routes = [
 
   { path: 'articles/:id', component: ArticleDetailComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+  { path: 'market', component: MarketComponent, canActivate: [AuthGuard] },
+  { path: 'market/commodity/:name', component: CommodityDetailComponent, canActivate: [AuthGuard] },
   {
     path: 'survey/:surveyId',
     component: SurveyComponent,

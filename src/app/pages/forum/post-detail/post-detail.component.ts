@@ -120,7 +120,7 @@ export class PostDetailComponent implements OnInit {
         // build quick lookup: { "wood": "/market/wood-id", ... }
         const lookup: Record<string,string> = {};
         for (const n of names) {
-          lookup[n.name.toLowerCase()] = n.link;
+          lookup[n.name] = n.link;
         }
 
         // split + enrich tokens
@@ -167,7 +167,7 @@ export class PostDetailComponent implements OnInit {
       const m = /^\$([A-Za-z]+)$/.exec(p);
       if (m) {
         const name = m[1];
-        const link = lookup[name.toLowerCase()];
+        const link = lookup[name];
         if (link) {
           return { type: 'commodity', value: name, link: link };
         }
@@ -184,7 +184,10 @@ export class PostDetailComponent implements OnInit {
       this.auth.getCurrentUser().pipe(take(1))
     );
   }
-
+  goToCommodity(link:string|undefined){
+    if(link === undefined) return;
+    this.router.navigateByUrl('/market/commodity/' + link);
+  }
   openEditPost(postEdit: Post) {
     if( this.isLocked) {
       this.snackBar.open('Post is locked', 'Dismiss', { duration: 3000 });
