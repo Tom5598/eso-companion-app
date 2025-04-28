@@ -25,11 +25,13 @@ import { ArticleDetailComponent } from './components/article-detail/article-deta
 import { MarketComponent } from './pages/market/market.component';
 import { CommodityComponent } from './pages/market/commodity/commodity.component';
 import { CommodityDetailComponent } from './pages/market/commodity-detail/commodity-detail.component';
+import { CharacterBuilderComponent } from './pages/character-builder/character-builder.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'home', component: HomeComponent },
+  { path: 'character', component: CharacterBuilderComponent, canActivate: [AuthGuard] },
   { path: 'forum', component: ForumComponent },
   {
     path: 'forum/post-edit/:id',
