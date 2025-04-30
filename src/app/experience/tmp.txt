@@ -1,0 +1,71 @@
+let boneHelmet :any;
+    let boneArmor :any;
+    let boneHips :any;
+    //Load character model
+    const loader = new GLTFLoader();
+    loader.load(
+      './Animation_Idle_02_withSkin.glb',
+      (gltf) => {
+        console.log('gltf', gltf);
+        const model = gltf.scene;        
+        model.scale.set(1, 1, 1);
+        model.receiveShadow = true; // allow other objects to cast shadows onto it
+        model.castShadow = true; // allow this object to cast shadows 
+        this.scene.add(model);
+        boneHelmet = model.getObjectByName('Head') as THREE.Bone;
+        boneArmor = model.getObjectByName('Spine01') as THREE.Bone;
+        boneHips = model.getObjectByName('Hips') as THREE.Bone;         
+        loader.load(
+          './helmet.glb',
+          (gltf) => {
+            console.log('gltf:helemt', gltf);
+            const helmet = gltf.scene; 
+            helmet.scale.setScalar(17 ); // Scale the armor to fit the character
+            helmet.position.set(0,3,-6) // Set position to (0, 0, 0)
+            helmet.rotation.set(100,0,0); // Rotate the armor to fit the character
+            helmet.receiveShadow = true; // allow other objects to cast shadows onto it
+            helmet.castShadow = true; // allow this object to cast shadows
+            boneHelmet.add(helmet);  
+          },
+          undefined,
+          (error) => console.error('GLTF load error', error)
+        );
+        loader.load(
+          './chest.glb',
+          (gltf) => {
+            console.log('gltf:armor', gltf);
+            const armor = gltf.scene; 
+            armor.scale.setScalar(65 ); // Scale the armor to fit the character
+            armor.position.set(0,-3,-2) // Set position to (0, 0, 0)
+            armor.rotation.set(0,0,0); // Rotate the armor to fit the character
+            armor.receiveShadow = true; // allow other objects to cast shadows onto it
+            armor.castShadow = true; // allow this object to cast shadows
+            boneArmor.add(armor);  
+          },
+          undefined,
+          (error) => console.error('GLTF load error', error)
+        );
+        loader.load(
+          './legs.glb',
+          (gltf) => {
+            console.log('gltf:legs', gltf);
+            const legs = gltf.scene; 
+            legs.scale.setScalar(90 ); // Scale the armor to fit the character
+            legs.position.set(0,-80,0) // Set position to (0, 0, 0)
+            legs.rotation.set(0,0,0); // Rotate the armor to fit the character
+            legs.receiveShadow = true; // allow other objects to cast shadows onto it
+            legs.castShadow = true; // allow this object to cast shadows
+            boneHips.add(legs);  
+          },
+          undefined,
+          (error) => console.error('GLTF load error', error)
+        );
+
+        this.mixer = new THREE.AnimationMixer(model);
+        const walkClip = gltf.animations[0]; 
+        const action = this.mixer.clipAction(walkClip);   // create an action
+        //action.play();
+      },
+      undefined,
+      (error) => console.error('GLTF load error', error)
+    );

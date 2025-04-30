@@ -1,0 +1,14 @@
+<div class="items-container">
+  <h2 mat-dialog-title>Select {{ data.slot | titlecase }}</h2>
+    <mat-dialog-content>
+      <mat-grid-list cols="3" rowHeight="120px" gutterSize="10px">
+        <mat-grid-tile *ngFor="let it of data.items" class="tile">
+          <img [src]="it.preview" alt="{{it.name}}" />
+          <div class="overlay">
+            <button mat-mini-fab (click)="select(it.url)">✔</button>
+          </div>
+        </mat-grid-tile>
+      </mat-grid-list>
+    </mat-dialog-content>
+  
+</div>

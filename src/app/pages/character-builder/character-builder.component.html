@@ -1,1 +1,30 @@
-<ngt-canvas [sceneGraph]="sceneGraph" />
+<div class="scene-container">
+  <div class="stats-bar">
+    <span>Health: {{ health }}</span>
+    <span class="spacer"></span>
+    <span>Stamina: {{ stamina }}</span>
+    <span class="spacer"></span>
+    <span>Magica: {{ magicka }}</span>
+    <span class="spacer"></span>
+    <span>Armor: {{ armor }}</span>
+    <span class="spacer"></span>
+    <span>Spell Resistance: {{ spellresistence }}</span>
+    <span class="spacer"></span>
+    <span>Weapon Resistence: {{ weaponresistence }}</span>
+    <span class="spacer"></span>
+    <span>Damage: {{ damage }}</span>
+  </div>
+
+  <!-- Three.js view -->
+  <app-experience></app-experience>
+
+  <div class="picker-panel mat-elevation-z4">
+    <button
+      mat-raised-button
+      *ngFor="let slot of slots"
+      (click)="openPicker(slot)"
+    >
+      {{ slot | titlecase }}
+    </button>
+  </div>
+</div> 
