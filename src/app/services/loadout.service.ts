@@ -9,7 +9,7 @@ export interface Loadout {
   helmet?: string;
   chest?: string;
   legs?: string;
-  arms?: string;
+  shield?: string;
   weapon?: string;
 }
 export interface Item {
@@ -25,7 +25,7 @@ export interface Item {
     magicka: number;
     stamina: number;
   };
-  slot: 'helmet' | 'chest' | 'legs' | 'arms' | 'weapon';
+  slot: 'helmet' | 'chest' | 'legs' | 'shield' | 'weapon';
 }
 @Injectable({
   providedIn: 'root',
@@ -71,7 +71,7 @@ export class LoadoutService {
                 stats,
                 slot,
               }))
-            ,tap(() => {console.log('Fetched items:', rawList.map(item =>{console.log(item)}));}));
+            ,tap(() => {console.log('Fetched items:', rawList);}));
           });
           
           return forkJoin(requests);

@@ -1,15 +1,15 @@
 <mat-toolbar color="primary" class="navbar-container">
   <!-- Logo / Home -->
-  <button mat-button routerLink="/home"><mat-icon>home</mat-icon></button>
+  <button mat-button routerLink="/home"><mat-icon>home</mat-icon><span>Home</span></button>
   <!-- Forum -->
   <button mat-button routerLink="/forum">
-    <mat-icon>forum</mat-icon> Forum
+    <mat-icon>forum</mat-icon><span>Forum</span> 
   </button>
   <button mat-button routerLink="/market" *ngIf="isLoggedIn">
-    <mat-icon>storefront</mat-icon> Market
+    <mat-icon>storefront</mat-icon><span>Market</span> 
   </button>
   <button mat-button routerLink="/character" *ngIf="isLoggedIn">
-    <mat-icon>crowdsource</mat-icon> Character Builder
+    <mat-icon>settings</mat-icon> <span>Character Builder</span>
   </button>
   <span class="spacer"></span>
   <!-- Only show our profile menu when logged in -->

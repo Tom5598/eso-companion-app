@@ -1,13 +1,5 @@
-import {
-  CUSTOM_ELEMENTS_SCHEMA,
-  Component,
-  ElementRef,
-  ChangeDetectionStrategy,
-  ViewChild,
-  AfterViewInit,
-  OnDestroy,
-} from '@angular/core';
-import { extend, injectBeforeRender } from 'angular-three';
+import {  CUSTOM_ELEMENTS_SCHEMA,  Component,  ElementRef,  ChangeDetectionStrategy,  ViewChild,  AfterViewInit,  OnDestroy, } from '@angular/core';
+import { extend } from 'angular-three';
 import { Mesh, BoxGeometry, MeshBasicMaterial } from 'three';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -19,18 +11,9 @@ extend({ Mesh, BoxGeometry, MeshBasicMaterial });
   selector: 'app-experience',
   template: `<canvas #canvas></canvas>`, 
   styles: [`
-    :host {
-    display: block;
-    width: 100%;
-    height: 50%;
-    overflow: hidden;
-    }
-    canvas {
-      width: 100%;
-      height: 50%;
-      display: block;
-    }
-    `],
+    :host {display: block; width: 100%; height: 50%; overflow: hidden;}
+    canvas {width: 100%; height: 50%; display: block;}
+  `],
   standalone: true,
   imports: [],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -39,6 +22,7 @@ extend({ Mesh, BoxGeometry, MeshBasicMaterial });
 export class Experience implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true })
   canvasRef!: ElementRef<HTMLCanvasElement>;
+
   constructor(private loadout : LoadoutService) {}
 
   private renderer!: THREE.WebGLRenderer;
@@ -48,17 +32,17 @@ export class Experience implements AfterViewInit, OnDestroy {
   private frameId?: number;
   private mixer!: THREE.AnimationMixer;
   clock = new THREE.Clock();
-// track currently rendered items
-private rendered: Record<string, THREE.Object3D> = {};
-
-// fixed positions for each slot
-private positionMap: Record<string, THREE.Vector3> = {
+  // track currently rendered items
+  private rendered: Record<string, THREE.Object3D> = {};
+  private lastLoadout: Loadout = {};
+  // fixed positions for each slot
+  private positionMap: Record<string, THREE.Vector3> = {
   helmet: new THREE.Vector3(-1.5, 1.8, 0),
   chest:  new THREE.Vector3(-0.5, 1.2, 0),
   legs:   new THREE.Vector3(0.5, 0.6, 0),
-  arms:   new THREE.Vector3(1.5, 1.2, 0),
+  shield:   new THREE.Vector3(1.5, 1.2, 0),
   weapon: new THREE.Vector3(0, 1.0, -1.5),
-};
+  };
   ngAfterViewInit(): void {
     // 1. Renderer
     this.renderer = new THREE.WebGLRenderer({
@@ -98,14 +82,43 @@ private positionMap: Record<string, THREE.Vector3> = {
     ground.rotation.x = -Math.PI / 2; // lay flat
     ground.receiveShadow = true; // allow other objects to cast shadows onto it
     this.scene.add(ground);
-    const loaderRock1 = new GLTFLoader();
-    this.loadout.loadout$.subscribe(lo => this.updateScene(lo));
+    // 4.5 Loadout
+    this.loadout.loadout$
+    .subscribe((lo) => {
+      Object.entries(lo).forEach(([slot, url]) => {
+        const prevUrl = this.lastLoadout[slot as keyof Loadout];
+        if (url === prevUrl) {
+          // no change → skip
+          return;
+        }
+        // if there was an old model, remove it
+        if (this.rendered[slot]) {
+          this.scene.remove(this.rendered[slot]);
+          delete this.rendered[slot];
+        }
+        // if there's a new URL, load & add it
+        if (url) {
+          this.loadSlot(slot as keyof Loadout, url);
+        }
+      });
+      // remember for next time
+      this.lastLoadout = { ...lo };
+    });
     // 5. Start rendering
     this.animate();
     // 6. Handle resize
     window.addEventListener('resize', this.onResize);
   }
 
+  private loadSlot(slot: keyof Loadout, url: string) {
+    new GLTFLoader().load(url, gltf => {
+      const obj = gltf.scene;
+      // do your shadow/traverse stuff…
+      obj.position.copy(this.positionMap[slot]);
+      this.scene.add(obj);
+      this.rendered[slot] = obj;
+    });
+  }
  /** Add or swap each slot’s GLB at its fixed position */
  private updateScene(lo: Loadout) {
   Object.entries(lo).forEach(([slot, url]) => {

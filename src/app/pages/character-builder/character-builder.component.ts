@@ -37,12 +37,12 @@ export class CharacterBuilderComponent implements OnInit, OnDestroy {
   armor = 0;
   weaponresistence = 0;
   spellresistence = 0;
-  slots: Array<Item['slot']> = ['helmet', 'chest', 'legs', 'arms', 'weapon'];
+  slots: Array<Item['slot']> = ['helmet', 'chest', 'legs', 'shield', 'weapon'];
   itemsBySlot: Record<Item['slot'], Item[]> = {
     helmet: [],
     chest: [],
     legs: [],
-    arms: [],
+    shield: [],
     weapon: [],
   };
   private subs = new Subscription();
