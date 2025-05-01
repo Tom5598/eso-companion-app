@@ -2,9 +2,19 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { doc, DocumentData, DocumentReference } from 'firebase/firestore';
-import { BehaviorSubject, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
-import { log } from 'three/webgpu';
+import { BehaviorSubject, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs'; 
 
+
+export interface BackgroundTransform {
+  position: { x: number; y: number; z: number };
+  rotation: { x: number; y: number; z: number };
+  scale:    { x: number; y: number; z: number };
+}
+
+export interface BackgroundItem {
+  url:       string;
+  transform: BackgroundTransform;
+}
 export interface Loadout {
   helmet?: string;
   chest?: string;
@@ -39,9 +49,17 @@ export class LoadoutService {
   private readonly subject = new BehaviorSubject<Loadout>({});
   readonly loadout$ = this.subject.asObservable();
 
-  setItem<K extends keyof Loadout>(slot: K, url: string) {
-    const current = this.subject.value;
-    this.subject.next({ ...current, [slot]: url });
+  getBackgroundModels(): Observable<string[]> {
+    return this.afs
+      .doc<{ models: string[] }>('utils/background')
+      .get()
+      .pipe(
+        map(snap => snap.data()?.models || []),
+        switchMap(models => models.length
+          ? forkJoin(models.map(path => this.storage.refFromURL(path).getDownloadURL()))
+          : of([] as string[])
+        )
+      );
   }
 
   getAllItems(): Observable<Item[]> {
@@ -50,8 +68,7 @@ export class LoadoutService {
       .get()
       .pipe(
         switchMap(snapshot => {
-          const data = snapshot.data();
-          const rawList = data?.itemList || [];
+          const rawList = snapshot.data()?.itemList || [];
           if (!rawList.length) {
             return of([] as Item[]);
           }
@@ -71,11 +88,15 @@ export class LoadoutService {
                 stats,
                 slot,
               }))
-            ,tap(() => {console.log('Fetched items:', rawList);}));
-          });
-          
+            );
+          });          
           return forkJoin(requests);
-        })
+        })  
       );
+  }
+
+  setItem<K extends keyof Loadout>(slot: K, url: string) {
+    const current = this.subject.value;
+    this.subject.next({ ...current, [slot]: url });
   }
 }

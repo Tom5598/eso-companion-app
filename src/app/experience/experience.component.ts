@@ -4,7 +4,7 @@ import { Mesh, BoxGeometry, MeshBasicMaterial } from 'three';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { Loadout, LoadoutService } from '../services/loadout.service';
+import { BackgroundItem, Item, Loadout, LoadoutService } from '../services/loadout.service';
 extend({ Mesh, BoxGeometry, MeshBasicMaterial });
 
 @Component({
@@ -24,7 +24,12 @@ export class Experience implements AfterViewInit, OnDestroy {
   canvasRef!: ElementRef<HTMLCanvasElement>;
 
   constructor(private loadout : LoadoutService) {}
-
+  // locally editable transforms, index matches the Firestore array order
+  private backgroundTransforms = [
+    { position: new THREE.Vector3( 2, 0, -3), rotation: new THREE.Euler(0, -0.25, 0), scale: new THREE.Vector3(2,2,2) },
+    { position: new THREE.Vector3(-2, 0, -2), rotation: new THREE.Euler(0, -0.4, 0), scale: new THREE.Vector3(1,1,1) },
+    { position: new THREE.Vector3(-1, 0, -1), rotation: new THREE.Euler(0, 0.2, 0), scale: new THREE.Vector3(1,1,1) },
+  ];
   private renderer!: THREE.WebGLRenderer;
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
@@ -37,12 +42,20 @@ export class Experience implements AfterViewInit, OnDestroy {
   private lastLoadout: Loadout = {};
   // fixed positions for each slot
   private positionMap: Record<string, THREE.Vector3> = {
-  helmet: new THREE.Vector3(-1.5, 1.8, 0),
-  chest:  new THREE.Vector3(-0.5, 1.2, 0),
-  legs:   new THREE.Vector3(0.5, 0.6, 0),
-  shield:   new THREE.Vector3(1.5, 1.2, 0),
-  weapon: new THREE.Vector3(0, 1.0, -1.5),
+  helmet: new THREE.Vector3(-2.1, 0.25, -1.8),
+  chest:  new THREE.Vector3(2, 1.5, -2.8),
+  legs:   new THREE.Vector3(2.8, 0.65, -2),
+  shield:   new THREE.Vector3(0.65, 1.5, -2.95),
+  weapon: new THREE.Vector3(1, 0.8, -1.5),
   };
+  private rotationMap: Record<string, THREE.Euler> = {
+    helmet: new THREE.Euler(0, 0.3, 0),
+    chest:  new THREE.Euler(0, -0.3, 0),
+    legs:   new THREE.Euler(0, -0.5, 0),
+    shield: new THREE.Euler(0, -0.5, 0),
+    weapon: new THREE.Euler(90, 0, 0),
+  };
+
   ngAfterViewInit(): void {
     // 1. Renderer
     this.renderer = new THREE.WebGLRenderer({
@@ -76,12 +89,21 @@ export class Experience implements AfterViewInit, OnDestroy {
     const material = new THREE.MeshBasicMaterial( { map: texture } );
     const mesh = new THREE.Mesh( geometry, material );
     this.scene.add( mesh );
+    
     const groundGeo = new THREE.PlaneGeometry(10, 10);
     const groundMat = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.8,});
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.rotation.x = -Math.PI / 2; // lay flat
-    ground.receiveShadow = true; // allow other objects to cast shadows onto it
+    ground.receiveShadow = true; // allow other objects to cast shadows onto it   
     this.scene.add(ground);
+    
+    this.loadout.getBackgroundModels().subscribe(urls => {
+      urls.forEach((url, idx) => {
+        const tf = this.backgroundTransforms[idx] 
+                  || { position: new THREE.Vector3(), rotation: new THREE.Euler(), scale: new THREE.Vector3(1,1,1) };
+        this.loadBackgroundModel(url, tf);
+      });
+    });
     // 4.5 Loadout
     this.loadout.loadout$
     .subscribe((lo) => {
@@ -109,12 +131,31 @@ export class Experience implements AfterViewInit, OnDestroy {
     // 6. Handle resize
     window.addEventListener('resize', this.onResize);
   }
-
+  private loadBackgroundModel(
+    url: string,
+    tf: { position: THREE.Vector3, rotation: THREE.Euler, scale: THREE.Vector3 }
+  ) {
+    new GLTFLoader().load(url, gltf => {
+      const obj = gltf.scene;
+      obj.position.copy(tf.position);
+      obj.rotation.copy(tf.rotation);
+      obj.scale   .copy(tf.scale);
+      obj.traverse(n => {
+        if ((n as THREE.Mesh).isMesh) {
+          const m = n as THREE.Mesh;
+          m.castShadow = true;
+          m.receiveShadow = true;
+        }
+      });
+      this.scene.add(obj);
+    });
+  }
   private loadSlot(slot: keyof Loadout, url: string) {
     new GLTFLoader().load(url, gltf => {
       const obj = gltf.scene;
       // do your shadow/traverse stuff…
       obj.position.copy(this.positionMap[slot]);
+      obj.rotation.copy(this.rotationMap[slot]);
       this.scene.add(obj);
       this.rendered[slot] = obj;
     });
