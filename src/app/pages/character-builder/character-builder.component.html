@@ -1,1 +1,53 @@
-<ngt-canvas [sceneGraph]="sceneGraph" />
+<div class="scene-container">
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-value">{{ health }}</div>
+      <div class="stat-label">Health</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ stamina }}</div>
+      <div class="stat-label">Stamina</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ magicka }}</div>
+      <div class="stat-label">Magicka</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ armor }}</div>
+      <div class="stat-label">Armor</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ spellresistence }}</div>
+      <div class="stat-label">Spell Res.</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ weaponresistence }}</div>
+      <div class="stat-label">Weap. Res.</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ damage }}</div>
+      <div class="stat-label">Damage</div>
+    </div>
+  </div>
+
+  <!-- Three.js view -->
+  <app-experience></app-experience>
+
+  <div class="picker-panel ">    
+    <button
+      mat-raised-button
+      *ngFor="let slot of slots"
+      (click)="openPicker(slot)"
+      matTooltip="Select {{ slot | titlecase }}"
+      matTooltipPosition="above"
+      matTooltipHideDelay="200"
+    > 
+    <img
+      src="/icons/{{slot}}_icon.png"
+      alt="{{slot}} icon"
+      width="64"
+      height="64"
+    />
+    </button>
+  </div>
+</div> 

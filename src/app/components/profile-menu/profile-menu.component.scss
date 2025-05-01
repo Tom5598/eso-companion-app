@@ -2,11 +2,11 @@
 .profile-menu {
   display: flex;
   align-items: center;
-  background-color: rgb(28, 184, 223);
+  background-color: rgba(255, 255, 255, 0);
   border-radius: 8px;
   box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
   padding: 4px;
-
+  margin-bottom: 10px;
   .avatar {
     width: 32px;
     height: 32px;

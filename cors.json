@@ -1,0 +1,14 @@
+[
+  {
+    "origin": ["http://localhost:4200"],
+    "method": ["GET", "HEAD"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": ["Content-Type"]
+  },
+  {
+    "origin": ["https://eso-companion-app-89474.web.app"],
+    "method": ["GET", "HEAD"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": ["Content-Type"]
+  }
+]
