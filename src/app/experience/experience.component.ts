@@ -11,8 +11,8 @@ extend({ Mesh, BoxGeometry, MeshBasicMaterial });
   selector: 'app-experience',
   template: `<canvas #canvas></canvas>`, 
   styles: [`
-    :host {display: block; width: 100%; height: 50%; overflow: hidden;}
-    canvas {width: 100%; height: 50%; display: block;}
+    :host {display: block; width: 100%; height: 93vh; overflow: hidden;}
+    canvas {width: 100%; height: 100%; display: block;}
   `],
   standalone: true,
   imports: [],
@@ -119,39 +119,7 @@ export class Experience implements AfterViewInit, OnDestroy {
       this.rendered[slot] = obj;
     });
   }
- /** Add or swap each slot’s GLB at its fixed position */
- private updateScene(lo: Loadout) {
-  Object.entries(lo).forEach(([slot, url]) => {
-    // remove previous
-    if (this.rendered[slot]) {
-      this.scene.remove(this.rendered[slot]);
-      delete this.rendered[slot];
-    }
-    // load & place new
-    if (url) {
-      new GLTFLoader().load(url, gltf => {
-        const obj = gltf.scene;
-        obj.traverse(n => {
-          if ((n as THREE.Mesh).isMesh) {
-            (n as THREE.Mesh).castShadow = true;
-            (n as THREE.Mesh).receiveShadow = true;
-          }
-        });
-        // position it
-        const pos = this.positionMap[slot] || new THREE.Vector3();
-        obj.position.copy(pos);
-        this.scene.add(obj);
-        this.rendered[slot] = obj;
-      });
-    }
-  });
-}
-
-
-
-
-
-
+ 
   private animate = () => {
     this.frameId = requestAnimationFrame(this.animate);
     const delta = this.clock.getDelta();  // seconds since last frame

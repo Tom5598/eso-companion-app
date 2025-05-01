@@ -1,30 +1,53 @@
 <div class="scene-container">
   <div class="stats-bar">
-    <span>Health: {{ health }}</span>
-    <span class="spacer"></span>
-    <span>Stamina: {{ stamina }}</span>
-    <span class="spacer"></span>
-    <span>Magica: {{ magicka }}</span>
-    <span class="spacer"></span>
-    <span>Armor: {{ armor }}</span>
-    <span class="spacer"></span>
-    <span>Spell Resistance: {{ spellresistence }}</span>
-    <span class="spacer"></span>
-    <span>Weapon Resistence: {{ weaponresistence }}</span>
-    <span class="spacer"></span>
-    <span>Damage: {{ damage }}</span>
+    <div class="stat-item">
+      <div class="stat-value">{{ health }}</div>
+      <div class="stat-label">Health</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ stamina }}</div>
+      <div class="stat-label">Stamina</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ magicka }}</div>
+      <div class="stat-label">Magicka</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ armor }}</div>
+      <div class="stat-label">Armor</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ spellresistence }}</div>
+      <div class="stat-label">Spell Res.</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ weaponresistence }}</div>
+      <div class="stat-label">Weap. Res.</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ damage }}</div>
+      <div class="stat-label">Damage</div>
+    </div>
   </div>
 
   <!-- Three.js view -->
   <app-experience></app-experience>
 
-  <div class="picker-panel mat-elevation-z4">
+  <div class="picker-panel ">    
     <button
       mat-raised-button
       *ngFor="let slot of slots"
       (click)="openPicker(slot)"
-    >
-      {{ slot | titlecase }}
+      matTooltip="Select {{ slot | titlecase }}"
+      matTooltipPosition="above"
+      matTooltipHideDelay="200"
+    > 
+    <img
+      src="/icons/{{slot}}_icon.png"
+      alt="{{slot}} icon"
+      width="64"
+      height="64"
+    />
     </button>
   </div>
 </div> 

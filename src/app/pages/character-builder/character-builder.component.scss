@@ -1,26 +1,84 @@
 .scene-container {
   position: relative;
   width: 100%;
-  height: 50%;
+  height: 100%;
+  overflow: hidden;
 }
+
 .stats-bar {
   position: absolute;
-  top: 0;
-  left: 0; right: 0;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0);
-  display: flex;
+  top: 0; left: 0; right: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 6px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.6);
   z-index: 10;
 }
-.spacer { flex: 1; }
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 4px 0;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1;
+}
+
+.stat-label {
+  margin-top: 2px;
+  font-size: 0.65rem;
+  color: #ccc;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ensure on very small screens it remains usable */
+@media (max-width: 400px) {
+  .stats-bar {
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    padding: 4px;
+    gap: 4px;
+  }
+  .stat-value { font-size: 1rem; }
+  .stat-label { font-size: 0.6rem; }
+}
+
+
+
+
+
+
+
+
 .picker-panel {
   position: absolute;
-  bottom: 70px;
+  bottom: 20px;
   left: 0; right: 0;
   padding: 1rem;
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0);
+  gap: 0.5rem; 
   z-index: 10;
+}
+.picker-panel button img {
+  display: block;
+  margin: 0 auto;
+}
+.picker-panel button{
+  width: 64px;
+  height: 64px;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+}
+.picker-panel button :hover{
+  transform: scale(1.1);
+  transition: transform 0.2s ease-in-out  ;
+  background-color: rgb(244, 247, 250); 
 }

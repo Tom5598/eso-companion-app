@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatButtonModule } from '@angular/material/button';
-import { Loadout } from '../../../services/loadout.service';
 
 export interface PickerItem { name: string; url: string; preview: string; }
 export interface PickerData {

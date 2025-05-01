@@ -13,6 +13,7 @@ import {
   PickerData,
 } from './item-picker/item-picker.component';
 import { Subscription } from 'rxjs';
+import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-character-builder',
@@ -22,7 +23,7 @@ import { Subscription } from 'rxjs';
     CommonModule,
     MatToolbarModule,
     MatButtonModule,
-    MatGridListModule,
+    MatGridListModule,MatTooltipModule,MatTooltip,
   ],
   templateUrl: './character-builder.component.html',
   styleUrl: './character-builder.component.scss',
@@ -99,7 +100,7 @@ export class CharacterBuilderComponent implements OnInit, OnDestroy {
       })),
     };
     this.dialog
-      .open(ItemPickerComponent, { data })
+      .open(ItemPickerComponent, { data, width: '600px', maxWidth: '90vw' })
       .afterClosed()
       .subscribe((modelUrl: string) => {
         if (modelUrl) {
