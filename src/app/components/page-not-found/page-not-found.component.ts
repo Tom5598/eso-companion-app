@@ -21,6 +21,6 @@ export class PageNotFoundComponent {
   ) {}
  
   navigateHome() { 
-    this.router.navigate(['/all']);
+    this.router.navigate(['/home']);
   } 
 }
