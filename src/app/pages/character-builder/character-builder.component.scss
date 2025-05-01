@@ -14,6 +14,8 @@
   padding: 6px;
   background: rgba(0, 0, 0, 0.6);
   z-index: 10;
+  
+  flex: 0 0 auto;
 }
 
 .stat-item {
@@ -39,8 +41,7 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-
-/* ensure on very small screens it remains usable */
+ 
 @media (max-width: 400px) {
   .stats-bar {
     grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
@@ -50,15 +51,30 @@
   .stat-value { font-size: 1rem; }
   .stat-label { font-size: 0.6rem; }
 }
+@media (max-height:800px) {
+  :host {
+    display: flex;
+    flex-direction: column;
+    height: 80dvh;       /* full screen */
+    margin: 0;
+  }
+}
 
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 93dvh;       /* full screen */
+  margin: 0;
+}
 
-
-
-
+app-experience{
+  flex: 1 1 auto;  
+}
 
 
 
 .picker-panel {
+  flex: 0 0 auto;
   position: absolute;
   bottom: 20px;
   left: 0; right: 0;

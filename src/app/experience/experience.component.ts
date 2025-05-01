@@ -11,7 +11,7 @@ extend({ Mesh, BoxGeometry, MeshBasicMaterial });
   selector: 'app-experience',
   template: `<canvas #canvas></canvas>`, 
   styles: [`
-    :host {display: block; width: 100%; height: 93vh; overflow: hidden;}
+    :host {display: block; width: 100%; height: 100dvh; overflow: hidden; padding-bottom: env(safe-area-inset-bottom);}
     canvas {width: 100%; height: 100%; display: block;}
   `],
   standalone: true,
