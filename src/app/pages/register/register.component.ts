@@ -7,6 +7,7 @@ import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-register',
@@ -17,7 +18,7 @@ import { Router } from '@angular/router';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButton,MatLabel
+    MatButton,MatLabel,TranslatePipe,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',

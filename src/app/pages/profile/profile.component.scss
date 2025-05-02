@@ -1,4 +1,5 @@
 .profile-container {
+  position: relative;
   max-width: 600px;
   margin: 2rem auto;
   display: flex;
@@ -8,7 +9,12 @@
     margin-bottom: 1rem;
     text-align: center;
   }
-
+  .lang-select {
+    position: absolute;    
+    top: 12px;
+    right: 12px;
+    width: 80px;
+  }
   .profile-pic-wrapper {
     position: relative;
     text-align: center;
@@ -32,7 +38,7 @@
   .notifications-tabs {
     width: 100%;
   }
-   
+
   .notification-list {
     /* Vertical scroll if too many */
     max-height: 600px;
@@ -42,20 +48,20 @@
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .notification-row {
     display: grid;
     /* three columns: icon | content | action */
     grid-template-columns: 32px 1fr auto;
     align-items: start;
     column-gap: 0.5rem;
-    padding:   10px; 
+    padding: 10px;
     /* allow the date+message to stack vertically */
     .content {
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
-  
+
       .date {
         font-size: 0.75rem;
         color: gray;
@@ -64,24 +70,20 @@
         font-size: 0.875rem;
       }
     }
-  
+
     .icon {
       font-size: 24px;
     }
-  
+
     button {
       /* keep the Dismiss button aligned top */
       align-self: start;
     }
   }
-  
+
   .no-notifs {
     text-align: center;
     color: gray;
     padding: 1rem;
   }
-  
-  
 }
-
-

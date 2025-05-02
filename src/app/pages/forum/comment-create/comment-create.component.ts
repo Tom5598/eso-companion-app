@@ -16,6 +16,7 @@ import { AuthService } from '../../../services/auth.service';
 import { take, switchMap } from 'rxjs/operators';
 import { MatButton, MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-comment-create',
@@ -23,7 +24,7 @@ import { MatInputModule } from '@angular/material/input';
   imports: [
     CommonModule,
     ReactiveFormsModule, MatInputModule,
-    MatBottomSheetModule, MatButtonModule
+    MatBottomSheetModule, MatButtonModule, TranslatePipe,
   ],
   templateUrl: './comment-create.component.html',
   styleUrls: ['./comment-create.component.scss']

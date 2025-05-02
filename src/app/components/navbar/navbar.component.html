@@ -1,26 +1,66 @@
 <mat-toolbar color="primary" class="navbar-container">
-  <!-- Logo / Home -->
-  <button mat-button routerLink="/home"><mat-icon>home</mat-icon><span>Home</span></button>
-  <!-- Forum -->
-  <button mat-button routerLink="/forum">
-    <mat-icon>forum</mat-icon><span>Forum</span> 
-  </button>
-  <button mat-button routerLink="/market" *ngIf="isLoggedIn">
-    <mat-icon>storefront</mat-icon><span>Market</span> 
-  </button>
-  <button mat-button routerLink="/character" *ngIf="isLoggedIn">
-    <mat-icon>settings</mat-icon> <span>Character Builder</span>
-  </button>
   <span class="spacer"></span>
-  <!-- Only show our profile menu when logged in -->
-  <app-profile-menu *ngIf="isLoggedIn"></app-profile-menu>
-  
-  <!-- If NOT logged in, show login/register -->
-  
-  <button mat-button routerLink="/login" *ngIf="!isLoggedIn">
-    <mat-icon>login</mat-icon> Login
-  </button>
-  <button mat-button routerLink="/register" *ngIf="!isLoggedIn">
-    <mat-icon>person_add</mat-icon> Register
-  </button>
+
+  <!-- Centered menu icon -->
+  <img
+    src="./icon.png"
+    alt="Menu"
+    class="menu-trigger"
+    [matMenuTriggerFor]="navMenu"
+  />
+
+  <span class="spacer"></span>
+  <app-profile-menu></app-profile-menu>
 </mat-toolbar>
+
+<mat-menu #navMenu="matMenu">
+  <!-- Admin -->
+  <button
+    mat-menu-item
+    *ngIf="(user$ | async) && (isAdmin$ | async)"
+    routerLink="/admin"
+  >
+    <mat-icon>terminal</mat-icon>
+    <span>{{'navbar.admin_dashboard'|translate}}</span>
+  </button>
+
+  <!-- Always-visible links -->
+  <button mat-menu-item routerLink="/home">
+    <mat-icon>home</mat-icon>
+    <span>{{'navbar.home'|translate}}</span>
+  </button>
+  <button mat-menu-item routerLink="/forum">
+    <mat-icon>forum</mat-icon>
+    <span>{{'navbar.forum'|translate}}</span>
+  </button>
+
+  <!-- Logged-in-only -->
+  <ng-container *ngIf="user$ | async">
+    <button mat-menu-item routerLink="/market">
+      <mat-icon>storefront</mat-icon>
+      <span>{{'navbar.market'|translate}}</span>
+    </button>
+    <button mat-menu-item routerLink="/character">
+      <mat-icon>settings</mat-icon>
+      <span>{{'navbar.character_builder'|translate}}</span>
+    </button>
+    <button mat-menu-item (click)="onLogout()">
+      <mat-icon>logout</mat-icon>
+      <span>{{'navbar.logout'|translate}}</span>
+    </button>
+  </ng-container>
+
+  <!-- Not-logged-in -->
+  <ng-container *ngIf="!(user$ | async)">
+    <button mat-menu-item routerLink="/login">
+      <mat-icon>login</mat-icon>
+      <span>{{'navbar.login'|translate}}</span>
+    </button>
+    <button mat-menu-item routerLink="/register">
+      <mat-icon>person_add</mat-icon>
+      <span>{{'navbar.register'|translate}}</span>
+    </button>
+  </ng-container>
+
+  
+</mat-menu>

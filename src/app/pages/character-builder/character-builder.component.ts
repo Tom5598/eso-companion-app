@@ -14,6 +14,7 @@ import {
 } from './item-picker/item-picker.component';
 import { Subscription } from 'rxjs';
 import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-character-builder',
@@ -23,7 +24,7 @@ import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
     CommonModule,
     MatToolbarModule,
     MatButtonModule,
-    MatGridListModule,MatTooltipModule,MatTooltip,
+    MatGridListModule,MatTooltipModule,MatTooltip,TranslatePipe,
   ],
   templateUrl: './character-builder.component.html',
   styleUrl: './character-builder.component.scss',

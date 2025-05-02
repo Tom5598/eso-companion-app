@@ -6,12 +6,9 @@ import {
   ElementRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-// Angular Material
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-// RxJS
 import {
   Subscription,
   switchMap,
@@ -21,8 +18,6 @@ import {
   of,
   combineLatest,
 } from 'rxjs';
-
-// Angular
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatListModule } from '@angular/material/list';
 import { AuthService } from '../../services/auth.service';
@@ -35,6 +30,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { SurveyService } from '../../services/survey.service';
 import { Survey } from '../../models/survey.model';
 import { Router } from '@angular/router';
+import { TranslationService } from '../../services/translation.service';
+import { TranslatePipe } from '@ngx-translate/core';
+
+
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -46,7 +45,7 @@ import { Router } from '@angular/router';
     MatTabsModule,
     MatListModule,
     MatSelectModule,
-    MatFormFieldModule,
+    MatFormFieldModule,TranslatePipe,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
@@ -61,14 +60,19 @@ export class ProfileComponent implements OnInit, OnDestroy {
   unread$!: Observable<Notification[]>;
   read$!: Observable<Notification[]>;
   incompleteSurveys$!: Observable<Survey[]>;
+  selectedLang!: string;
+  langs = ['en', 'hu'];
   constructor(
     private auth: AuthService,
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
     private userSvc: UserService,
     private surveySvc: SurveyService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private i18n: TranslationService
+  ) {
+    this.selectedLang = this.i18n.getCurrentLang(); 
+  }
 
   ngOnInit(): void {
     //Gets  loggedin user
@@ -95,6 +99,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
       switchMap((u) => (u ? this.userSvc.getNotifications(u.uid) : of([]))),
       map((arr) => arr.filter((n) => n.read))
     );
+  }
+  switch(lang: string) {
+    this.i18n.useLanguage(lang);
   }
   loadUserData(uid: string) {
     //Load the user's data from

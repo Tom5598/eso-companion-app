@@ -1,7 +1,7 @@
 <mat-card class="stats-card">
   <form [formGroup]="form" class="stats-form">
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Select Survey</mat-label>
+      <mat-label>{{'survey.select'|translate}}</mat-label>
       <mat-select formControlName="survey">
         <mat-option *ngFor="let s of surveyDefs$ | async" [value]="s.id">
           {{ s.name }}

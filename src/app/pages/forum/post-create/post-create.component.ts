@@ -40,6 +40,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommodityService } from '../../../services/commodity.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommodityNames } from '../../../models/commodity-names.model';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-post-create',
@@ -55,6 +56,7 @@ import { CommodityNames } from '../../../models/commodity-names.model';
     MatProgressBarModule,
     MatChipsModule,
     MatTooltipModule,
+    TranslatePipe,
   ],
   templateUrl: './post-create.component.html',
   styleUrls: ['./post-create.component.scss'],

@@ -8,6 +8,7 @@ import { MatToolbarModule }  from '@angular/material/toolbar';
 import { MatButtonModule }   from '@angular/material/button';
 import { MatDividerModule }  from '@angular/material/divider';
 import { RouterModule } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-home',
@@ -18,7 +19,7 @@ import { RouterModule } from '@angular/router';
     MatCardModule,
     MatDividerModule,
     MatButtonModule,
-    RouterModule,
+    RouterModule,TranslatePipe,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'

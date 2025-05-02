@@ -16,6 +16,7 @@ import { Observable } from 'rxjs';
 import { SurveyDefinition } from '../../../models/survey.model';
 import { SurveyService } from '../../../services/survey.service';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-survey-management',
@@ -30,6 +31,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatListModule,MatListItem,
     MatIcon,
     MatButtonModule,
+    TranslatePipe,
   ],
   templateUrl: './survey-management.component.html',
   styleUrl: './survey-management.component.scss',

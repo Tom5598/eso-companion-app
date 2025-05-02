@@ -1,19 +1,19 @@
 <mat-card class="email-container">
-  <h2>Send Bulk Email</h2>
+  <h2>{{'email.bulk' | translate}}</h2>
   <form [formGroup]="emailForm" (ngSubmit)="send()" class="email-form">
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Subject</mat-label>
+      <mat-label>{{'email.subject' | translate}}</mat-label>
       <input matInput formControlName="subject" />
       <mat-error *ngIf="emailForm.get('subject')?.hasError('required')">
-        Subject is required
+        {{'email.subject_required' | translate}}
       </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Body (HTML allowed)</mat-label>
+      <mat-label>{{'email.message' | translate}}</mat-label>
       <textarea matInput formControlName="body" rows="6"></textarea>
       <mat-error *ngIf="emailForm.get('body')?.hasError('required')">
-        Message body is required
+        {{'email.message_required' | translate}}
       </mat-error>
     </mat-form-field>
 
@@ -23,7 +23,7 @@
       type="submit"
       [disabled]="emailForm.invalid"
     >
-      Send to All Users
+      {{'email.send_to_all' | translate}}
     </button>
   </form>
 </mat-card>

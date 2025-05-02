@@ -1,61 +1,25 @@
-<!-- src/app/components/profile-menu/profile-menu.component.html -->
 <ng-container *ngIf="user$ | async as user">
   <div class="profile-menu">
-    <!-- Avatar -->
-    
-    <img
-      [src]="user.photoURL"
-      alt="Profile"
-      class="avatar"
-      matTooltip="User:{{user.username}}"
-      (click)="goToProfile()"
-      [matTooltipPosition]="'above'"
-      matTooltipHideDelay="200"
-    />
-
-    <!-- Username -->
-    <span class="username"></span>
-    <button mat-button *ngIf="isAdmin$ | async"
-      aria-label="Admin Dashboard"
-      matTooltip="Admin Dashboard"
-      [matTooltipPosition]="'above'"
-      matTooltipHideDelay="200"
-      (click)="goToAdminDashboard()"
-    >
-      <mat-icon color="primary">terminal</mat-icon> 
-    </button>
-    <!-- Notifications -->
     <button
       mat-icon-button
-      routerLink="/notifications"
-      [color]="(unreadCount$ | async) ? 'warn' : undefined"      
-      aria-label="Notifications"
-      matTooltip="Notifications"
-      [matTooltipPosition]="'above'"
-      matTooltipHideDelay="200"
-      (click)="goToProfile()"
-    >
-      <mat-icon
+      routerLink="/profile"
+      aria-label="Profile"
       matBadge="{{ unreadCount$ | async }}"
       matBadgeHidden="{{ !(unreadCount$ | async) }}"
       matBadgeOverlap="true"
-      matBadgePosition="after" 
-      matBadgeSize="medium"
-      aria-hidden="false"
-      >notifications</mat-icon>
-    </button>
-
-    <!-- Logout -->
-    <button
-      mat-icon-button
-      class="logout"
-      (click)="logout()"
-      aria-label="Logout"
-      matTooltip="Logout"
+      matBadgePosition="below after"
+      matBadgeSize="small"
+      matTooltip="{{ user.username }}"
       [matTooltipPosition]="'above'"
       matTooltipHideDelay="200"
+      (click)="goToProfile()"
     >
-      <mat-icon>exit_to_app</mat-icon>
+      <img
+        [src]="user.photoURL"
+        alt="Profile"
+        class="avatar"
+        (click)="goToProfile()"
+      />
     </button>
   </div>
 </ng-container>

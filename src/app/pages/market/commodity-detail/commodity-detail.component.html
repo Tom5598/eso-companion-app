@@ -8,10 +8,10 @@
 <mat-card *ngIf="commodity" class="detail-card">
   <!-- Toggle 30/60 days -->
   <mat-form-field appearance="fill">
-    <mat-label>History (days)</mat-label>
+    <mat-label>{{'market.history'|translate}}</mat-label>
     <mat-select [formControl]="daysControl">
-      <mat-option [value]="30">30 days</mat-option>
-      <mat-option [value]="60">60 days</mat-option>
+      <mat-option [value]="30">{{'market.30days'|translate}}</mat-option>
+      <mat-option [value]="60">{{'market.60days'|translate}}</mat-option>
     </mat-select>
   </mat-form-field>
 
@@ -21,7 +21,7 @@
   </div>
 
   <!-- Scatter: regional price vs volume -->
-  <h3>Regional Price vs Volume</h3>
+  <h3>{{'market.regional'|translate}}</h3>
   <div class="chart-wrapper">
     <canvas #regionCanvas></canvas>
   </div>
