@@ -22,6 +22,7 @@ import {
 import { Commodity } from '../../../models/commodity.model';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslatePipe } from '@ngx-translate/core';
 
 Chart.register(...registerables);
 
@@ -33,7 +34,7 @@ Chart.register(...registerables);
     MatCardModule,
     MatDividerModule,
     MatListModule,
-    MatButtonModule,RouterModule
+    MatButtonModule,RouterModule, TranslatePipe,
   ],
   templateUrl: './commodity.component.html',
   styleUrl: './commodity.component.scss'

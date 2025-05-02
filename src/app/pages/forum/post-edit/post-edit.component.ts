@@ -8,13 +8,14 @@ import { ForumService } from '../../../services/forum.service';
 import { catchError, of } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInput } from '@angular/material/input';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-post-edit',
   standalone: true,
   imports: [
     MatDialogModule, CommonModule,MatFormField, MatLabel, FormsModule, ReactiveFormsModule,MatButtonModule,
-    MatInput
+    MatInput, TranslatePipe,
   ],
   templateUrl: './post-edit.component.html',
   styleUrl: './post-edit.component.scss'

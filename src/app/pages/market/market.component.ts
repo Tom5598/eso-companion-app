@@ -11,6 +11,7 @@ import { CommodityService } from '../../services/commodity.service';
 import { Commodity, CommodityFilter }    from '../../models/commodity.model';
 import { Observable }   from 'rxjs'; 
 import { CommodityComponent } from './commodity/commodity.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-market',
@@ -23,7 +24,8 @@ import { CommodityComponent } from './commodity/commodity.component';
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    CommodityComponent
+    CommodityComponent,
+    TranslatePipe,
   ],
   templateUrl: './market.component.html',
   styleUrl: './market.component.scss'
@@ -54,14 +56,4 @@ export class MarketComponent  implements OnInit {
     const f: CommodityFilter = this.form.value;
     this.commodities$ = this.commoditySvc.queryCommodities(f);
   }
-  /*onSeedClick() {
-    this.commoditySvc.populateDB().subscribe({
-      next: () => alert('Database seeded with mock ESO commodity data!'),
-      error: err => alert('Error seeding DB: ' + err)
-    });
-  }
-  onUpdateClick() {
-    this.commoditySvc.updateCommodityNames();
-  }
-    */
 }

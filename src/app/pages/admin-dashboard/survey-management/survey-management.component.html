@@ -1,15 +1,15 @@
 <mat-card class="survey-mgmt-card">
-  <h2>Survey Management</h2>
+  <h2>{{'survey.management'|translate}}</h2>
   <form
     [formGroup]="surveyForm"
     (ngSubmit)="createDefinition()"
     class="survey-form"
   >
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Survey Name</mat-label>
+      <mat-label>{{'survey.name'|translate}}</mat-label>
       <input matInput formControlName="name" />
       <mat-error *ngIf="surveyForm.get('name')?.hasError('required')">
-        Name is required
+        {{'survey.name_required'|translate}}
       </mat-error>
     </mat-form-field>
 
@@ -19,10 +19,10 @@
         class="question-row"
       >
         <mat-form-field appearance="fill" class="question-field">
-          <mat-label>Question {{ i + 1 }}</mat-label>
+          <mat-label>{{'survey.question'|translate}} {{ i + 1 }}</mat-label>
           <input matInput [formControlName]="i" />
           <mat-error *ngIf="ctrl.hasError('required')">
-            Question text is required
+            {{'survey.question_required'|translate}}
           </mat-error>
         </mat-form-field>
         <button
@@ -38,7 +38,7 @@
 
     <div class="buttons-row">
       <button mat-button type="button" (click)="addQuestion()">
-        Add Question
+        {{ 'survey.add_question' | translate }}
       </button>
       <button
         mat-raised-button
@@ -46,36 +46,36 @@
         type="submit"
         [disabled]="surveyForm.invalid"
       >
-        Create Survey
+        {{ 'survey.create_survey' | translate }}
       </button>
     </div>
   </form>
 
-  <h3>Existing Surveys</h3>
+  <h3>{{'survey.existing_surveys'|translate}}</h3>
   <mat-list>
     <mat-list-item *ngFor="let def of definitions$ | async">
       <div mat-line>
-        <strong>Survey - {{ def.name }}:</strong>
+        <strong>{{'survey.survey'|translate}} - {{ def.name }}:</strong>
         <button
           mat-stroked-button
           color="warn"
           (click)="toggleHidden(def)"
           style="margin-left: 1rem;"
         >
-          {{ def.isHidden ? 'Unhide' : 'Hide' }}
+          {{ def.isHidden ? ('survey.show' | translate) : ('survey.hide' | translate) }}
         </button>
       </div>
       <div mat-line>
-        {{ def.questions.length }} question{{
+        {{ def.questions.length }} {{'survey.question'|translate}}{{
           def.questions.length === 1 ? "" : "s"
         }}
-        <span *ngIf="def.isHidden" class="hidden-survey">(hidden)</span>
+        <span *ngIf="def.isHidden" class="hidden-survey">({{'survey.hidden'|translate}})</span>
       </div>
       <hr />
     </mat-list-item>
 
     <mat-list-item *ngIf="(definitions$ | async)?.length === 0">
-      <div mat-line>No surveys defined yet.</div>
+      <div mat-line>{{'survey.no_surveys'|translate}}.</div>
     </mat-list-item>
   </mat-list>
 </mat-card>

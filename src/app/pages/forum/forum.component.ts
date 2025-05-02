@@ -29,6 +29,7 @@ import {MatSelectModule} from '@angular/material/select';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { LoadingIndicatorComponent } from "../../components/loading-indicator/loading-indicator.component";
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-forum',
   standalone: true,
@@ -48,7 +49,7 @@ import { LoadingIndicatorComponent } from "../../components/loading-indicator/lo
     MatNativeDateModule,
     MatSlideToggleModule,
     MatNativeDateModule, MatProgressSpinnerModule,
-    LoadingIndicatorComponent
+    LoadingIndicatorComponent, TranslatePipe,
 ],
   templateUrl: './forum.component.html',
   styleUrl: './forum.component.scss'

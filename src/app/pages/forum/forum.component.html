@@ -15,28 +15,28 @@
       </button>
     </span>
 
-    <h3 class="p-2">Filters</h3>
+    <h3 class="p-2">{{'forum.filters'|translate}}</h3>
     <form [formGroup]="filterForm" class="filter-form">
       <!-- Title -->
       <mat-form-field appearance="fill">
-        <mat-label>Title</mat-label>
+        <mat-label>{{'forum.title'|translate}}</mat-label>
         <input matInput formControlName="titleFilter" />
       </mat-form-field>
       <!-- Order -->
       <mat-form-field appearance="fill">
-        <mat-label>Order by Date</mat-label>
+        <mat-label>{{'forum.orderby'|translate}}</mat-label>
         <mat-select formControlName="dateOrder">
-          <mat-option value="desc">Newest First</mat-option>
-          <mat-option value="asc">Oldest First</mat-option>
+          <mat-option value="desc">{{'forum.new'|translate}}</mat-option>
+          <mat-option value="asc">{{'forum.old'|translate}}</mat-option>
         </mat-select>
       </mat-form-field>
       
       <!-- Hot first -->
-      <mat-slide-toggle formControlName="hotFirst">Hot First</mat-slide-toggle>
+      <mat-slide-toggle formControlName="hotFirst">{{'forum.hot'|translate}}</mat-slide-toggle>
       <br>
       <!-- Hashtags -->       
       <button mat-button type="button" (click)="clearTags()">
-        Deselect All
+        {{'forum.deselect'|translate}}
       </button>
   
       <!-- SCROLLABLE CHIP LIST -->
@@ -56,7 +56,7 @@
       </div>
       
       <button mat-raised-button color="primary" (click)="applyFilters()">
-        Apply Filters
+        {{'forum.apply'|translate}}
       </button>
     </form>
   </mat-sidenav>
@@ -74,20 +74,20 @@
     <ng-container *ngIf="posts$ | async as posts; else loading">
     <div *ngIf="!(posts$ | async)?.length" class="no-posts">
       <mat-card class="no-posts-card">
-        <mat-card-title>No posts found</mat-card-title>
+        <mat-card-title>{{'forum.no_posts'|translate}}</mat-card-title>
         <mat-card-content>
-          <p>Try changing the filters or creating a new post.</p>
+          <p>{{'forum.no_post_msg'|translate}}</p>
         </mat-card-content>
       </mat-card>
 
     </div>
-    <h1>Forum</h1>
+    <h1>{{'forum.forum'|translate}}</h1>
     <div class="view-toggle" >
          <button
            mat-icon-button
            (click)="toggleView('list')"
            [color]="viewMode === 'list' ? 'primary' : undefined"
-           matTooltip="List view"
+           matTooltip="{{'forum.list'|translate}}"
          >
            <mat-icon>format_list_bulleted</mat-icon>
          </button>
@@ -95,7 +95,7 @@
            mat-icon-button
            (click)="toggleView('grid')"
            [color]="viewMode === 'grid' ? 'primary' : undefined"
-           matTooltip="Grid view"
+           matTooltip="{{'forum.grid'|translate}}"
          >
            <mat-icon>grid_view</mat-icon>
          </button>
@@ -109,7 +109,7 @@
       >
         <mat-card-title class="truncate">{{ post.title }}</mat-card-title>
         <mat-card-subtitle class="truncate">
-          by {{ post.username }} ·
+          {{'forum.by'|translate}} {{ post.username }} ·
           {{ post.createdAt | toDate | date : "short" }}
         </mat-card-subtitle>
         <mat-card-content>
@@ -122,7 +122,7 @@
           <span>
             <mat-icon
               color="primary"
-              matTooltip="Comments"
+              matTooltip="{{'forum.comments'|translate}}"
               [matTooltipPosition]="'above'"
               matTooltipHideDelay="100"
               >comment</mat-icon
@@ -152,6 +152,9 @@
       aria-label="New post"
       class="fab"
       routerLink="/forum/post-create"
+      matTooltip="{{'forum.new_post'|translate}}"
+      [matTooltipPosition]="'left'"
+      matTooltipHideDelay="100"
     >
       <mat-icon>add</mat-icon>
     </button>

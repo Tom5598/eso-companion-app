@@ -1,14 +1,28 @@
 .navbar-container {
+  position: relative;
   display: flex;
-  align-items: center;
+  align-items: center; 
   background-image: url('../../../../public/tbar.png');
+  
   background-size:contain;
   background-repeat: repeat;
   color: gold; 
   .spacer {
     flex: 1 1 auto;
   }
+  .menu-trigger {
+    width: 42px;
+    height: 42px;
+    cursor: pointer;
+    margin-bottom: 14px;
+    transition: transform 2s ease-in-out;
+  }
+  .menu-trigger:hover {
+    /* single 360° spin */
+    transform: rotate(360deg);
+  }
+  
 }
 span{
   color: gold;
-}
+} 

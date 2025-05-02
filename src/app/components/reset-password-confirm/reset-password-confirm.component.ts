@@ -6,11 +6,12 @@ import { CommonModule }        from '@angular/common';
 import { MatCardModule }       from '@angular/material/card';
 import { MatInputModule }      from '@angular/material/input';
 import { MatButtonModule }     from '@angular/material/button';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-reset-password-confirm',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatCardModule, MatInputModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatCardModule, MatInputModule, MatButtonModule,TranslatePipe,],
   templateUrl: './reset-password-confirm.component.html',
   styleUrl: './reset-password-confirm.component.scss'
 })

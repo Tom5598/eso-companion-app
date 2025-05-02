@@ -14,11 +14,12 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import {MatSliderModule} from '@angular/material/slider';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-survey',
   standalone: true,
   imports: [CommonModule, MatCardModule, MatListModule, MatButtonModule, FormsModule, MatSlideToggleModule,MatSliderModule, ReactiveFormsModule,
-    MatIcon, MatTooltipModule
+    MatIcon, MatTooltipModule, TranslatePipe,
   ],
   templateUrl: './survey.component.html',
   styleUrl: './survey.component.scss'

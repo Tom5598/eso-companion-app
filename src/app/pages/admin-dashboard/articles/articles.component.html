@@ -2,16 +2,16 @@
   <form [formGroup]="form" (ngSubmit)="submit()">
     <!-- Title -->
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Title</mat-label>
+      <mat-label>{{'article.title'|translate}}</mat-label>
       <input matInput formControlName="title" placeholder="Article title" />
       <mat-error *ngIf="form.get('title')?.hasError('required')">
-        Title is required
+        {{'article.title_required' | translate}}
       </mat-error>
     </mat-form-field>
 
     <!-- Thumbnail -->
     <div class="thumbnail-section">
-      <label>Thumbnail (JPEG/PNG, ≤1920×1080)</label>
+      <label>{{'article.thumbnail'|translate}} (JPEG/PNG, ≤1920×1080)</label>
       <input
         type="file"
         hidden
@@ -55,17 +55,17 @@
         <!-- text paragraph -->
         <ng-container *ngIf="blockCtrl.get('type')!.value === 'text'">
           <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Paragraph {{ i + 1 }}</mat-label>
+            <mat-label>{{'article.paragraph'|translate}} {{ i + 1 }}</mat-label>
             <textarea matInput formControlName="text" rows="3"></textarea>
             <mat-error *ngIf="blockCtrl.get('text')?.hasError('required')">
-              Text is required
+              {{'article.text_required' | translate}}
             </mat-error>
           </mat-form-field>
         </ng-container>
 
         <!-- image block -->
         <ng-container *ngIf="blockCtrl.get('type')!.value === 'image'">
-          <label>Image {{ i + 1 }} (JPEG/PNG, ≤1920×1080)</label>
+          <label>{{'article.image'|translate}} {{ i + 1 }} (JPEG/PNG, ≤1920×1080)</label>
           <input
             type="file"
             hidden
@@ -93,16 +93,16 @@
     <!-- Add buttons -->
     <div class="buttons-row">
       <button mat-button type="button" (click)="addTextBlock()">
-        Add Paragraph
+        {{'article.add_text' | translate}}
       </button>
       <button mat-button type="button" (click)="addImageBlock()">
-        Insert Image
+        {{'article.add_image' | translate}}
       </button>
     </div>
-
+    <br>
     <!-- Submit -->
     <button mat-raised-button color="primary" type="submit" disabled="{{blocks.length === 0}}">
-      Create Article
+      {{'article.create_article' | translate}}
     </button>
     
   </form>

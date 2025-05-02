@@ -1,29 +1,29 @@
 <form [formGroup]="form" (ngSubmit)="savePost()" class="form">
-  <h2>Create new post</h2>
+  <h2>{{'forum.new_post'|translate}}</h2>
   <mat-form-field appearance="fill" class="w-100">
-    <mat-label>Title</mat-label>
+    <mat-label>{{'forum.title'|translate}}</mat-label>
     <input matInput formControlName="title" />
     @if (form.get('title')?.hasError('required')) {
-    <mat-error>Title is required!</mat-error>
+    <mat-error>{{'forum.title_required'|translate}}!</mat-error>
     } @if (form.get('title')?.hasError('minlength')) {
-    <mat-error> Title is too short!</mat-error>
+    <mat-error> {{'forum.title_min'|translate}}!</mat-error>
     } @if (form.get('title')?.hasError('maxlength')) {
-    <mat-error> Title is too long!</mat-error>
+    <mat-error> {{'forum.title_max'|translate}}!</mat-error>
     }
   </mat-form-field>
 
   <mat-form-field appearance="fill" class="w-100">
-    <mat-label>Content</mat-label>
+    <mat-label>{{'forum.content'|translate}}</mat-label>
     <textarea
       matInput rows="5"
       formControlName="content" 
     ></textarea>
     @if (form.get('content')?.hasError('required')) {
-      <mat-error>Content is required!</mat-error>
+      <mat-error>{{'forum.content_required'|translate}}!</mat-error>
       } @if (form.get('content')?.hasError('minlength')) {
-      <mat-error> Content is too short!</mat-error>
+      <mat-error> {{'forum.content_min'|translate}}!</mat-error>
       } @if (form.get('content')?.hasError('maxlength')) {
-      <mat-error> Content is too long!</mat-error>
+      <mat-error> {{'forum.content_max'|translate}}!</mat-error>
       }
   </mat-form-field> 
   
@@ -38,8 +38,8 @@
   
   <br><br>
   <!-- Hashtag picker -->
-  <mat-label matTooltip="You can add up to 10 hastags to a post" [matTooltipPosition]="'above'"
-  matTooltipHideDelay="100" class="tagsTip">Available tags:</mat-label><br><br>
+  <mat-label matTooltip="{{'forum.tag_tip'|translate}}" [matTooltipPosition]="'above'"
+  matTooltipHideDelay="100" class="tagsTip">{{'forum.tags'|translate}}:</mat-label><br><br>
   <mat-chip-listbox aria-label="Tag selection" multiple>
     <mat-chip-option
       *ngFor="let tag of tags$ | async"
@@ -73,7 +73,7 @@
     (click)="fileInput.click()"
     [disabled]="files.length >= 10"
   >
-    <mat-icon>photo_camera</mat-icon> Add images ({{ files.length }}/10)
+    <mat-icon>photo_camera</mat-icon>{{'forum.add_images'|translate}} ({{ files.length }}/10)
   </button>
 
   <!-- thumbnails -->
@@ -99,6 +99,6 @@
     type="submit"
     [disabled]="form.invalid || uploading"
   >
-    Publish
+  {{'forum.publish'|translate}}
   </button>
 </form>

@@ -4,10 +4,10 @@
     <mat-card-title>{{ post.title }}</mat-card-title>
     <!-- Meta: author  dates -->
     <mat-card-subtitle>
-      by {{ post.username }} • {{ post.createdAt | toDate | date : "short" }}
+      {{'forum.by'|translate}} {{ post.username }} • {{ post.createdAt | toDate | date : "short" }}
       @if (post.isEdited) {
       <ng-container>
-        • (edited: {{ post.updatedAt | toDate | date : "short" }})
+        • ({{'forum.edited'|translate}}: {{ post.updatedAt | toDate | date : "short" }})
       </ng-container>
       }
     </mat-card-subtitle>
@@ -56,7 +56,7 @@
         mat-button
         [disabled]="post.isLocked"
         color="warn"
-        matTooltip="Toggles the like on this post."
+        matTooltip="{{'forum.like'|translate}}"
         [matTooltipPosition]="'above'"
         matTooltipHideDelay="200"
         (click)="toggleLike()"
@@ -72,7 +72,7 @@
         (click)="openComment()"
         color="primary"
       >
-        Comment
+      {{'forum.comment'|translate}}
       </button>
       }@else {
       <button
@@ -92,7 +92,7 @@
         (click)="share()"
         color="accent"
       >
-        Share
+      {{'forum.share'|translate}}
       </button>
       @if (currentUserId$ && post.authorId == currentUserId$?.uid) {
       <button
@@ -100,19 +100,19 @@
         [disabled]="post.isLocked"
         (click)="openEditPost(post)"
       >
-        Edit
+      {{'forum.edit'|translate}}
       </button>
       <button mat-button color="warn" (click)="onDeletePost(post.id)">
-        Delete
+        {{'forum.delete'|translate}}
       </button>
       }
       @if (isAdmin) {
       <button mat-button color="warn" (click)="onDeletePost(post.id)">
-        Delete
+        {{'forum.delete'|translate}}
       </button>
       <button mat-button color="warn" (click)="onToggleLockPost(post.id)">
         <mat-icon color="warn">{{ isLocked ? "lock_open" : "lock" }}</mat-icon
-        >{{ isLocked ? "Unlock Post" : "Lock Post" }}
+        >{{ isLocked ? ('forum.unlock'|translate) : ('forum.lock'|translate) }}
       </button>
       }
     </mat-card-actions>

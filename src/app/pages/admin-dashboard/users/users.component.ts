@@ -21,9 +21,11 @@ import {
   tap,
   delay,
   first,
+  take,
 } from 'rxjs/operators';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../../services/auth.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-users',
@@ -39,6 +41,7 @@ import { AuthService } from '../../../services/auth.service';
     MatIconModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
+    TranslatePipe,
   ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss',
@@ -48,7 +51,7 @@ export class UsersComponent implements OnInit {
   users$!: Observable<User[]>;
   isLoading = false;
   constructor(private adminSvc: AdminService, private auth:AuthService) {}
-
+  currentUserID: string |null= '';
   ngOnInit() {
     this.users$ = this.searchControl.valueChanges.pipe(
       startWith(''),
@@ -64,10 +67,13 @@ export class UsersComponent implements OnInit {
         )
       )
     );
+    this.auth.getCurrentUserID().pipe(take(1)).subscribe((uid) => {
+      this.currentUserID = uid;
+    });
   }
 
   toggleUser(u: User) {
-    if (this.auth.isAdmin$()) {
+    if (u.uid == this.currentUserID) {
       alert('You cannot disable your own admin account!');
       return;
     }

@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AdminService } from '../../../services/admin.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-emails',
@@ -17,7 +18,9 @@ import { AdminService } from '../../../services/admin.service';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatSnackBarModule],
+    MatSnackBarModule,
+    TranslatePipe,
+  ],
   templateUrl: './emails.component.html',
   styleUrl: './emails.component.scss'
 })

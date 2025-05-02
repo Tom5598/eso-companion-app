@@ -1,21 +1,21 @@
 <div class="sheet">
-    <h3>New Comment</h3>
+    <h3>{{'forum.new_comment'|translate}}</h3>
     <textarea
       matInput
-      placeholder="Write your comment..."
+      placeholder="{{'forum.comment_placeholder'|translate}}"
       [formControl]="form.controls.content"
       rows="4"
     ></textarea>
   
     <div class="actions">
-      <button mat-button (click)="cancel()">Cancel</button>
+      <button mat-button (click)="cancel()">{{'general.cancel'|translate}}</button>
       <button
         mat-raised-button
         color="primary"
         (click)="post()"
         [disabled]="form.invalid"
       >
-        Post
+      {{'forum.post'|translate}}
       </button>
     </div>
   </div>

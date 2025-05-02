@@ -13,6 +13,7 @@ import { of, forkJoin, Observable }      from 'rxjs';
 import { last, switchMap, map } from 'rxjs/operators';
 import { ArticleBlockInput, ArticleService } from '../../../services/article.service';
 import { AuthService } from '../../../services/auth.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-articles',
@@ -27,6 +28,7 @@ import { AuthService } from '../../../services/auth.service';
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
+    TranslatePipe,
   ],
   templateUrl: './articles.component.html',
   styleUrl: './articles.component.scss'

@@ -1,13 +1,13 @@
 <mat-card class="login-container">
-  <h2>Login</h2>
+  <h2> {{'login.title'|translate}}</h2>
   <form (ngSubmit)="onLogin()" #loginForm="ngForm">
     <mat-form-field appearance="fill">
-      <mat-label>Email</mat-label>
+      <mat-label> {{'general.email'|translate}}</mat-label>
       <input matInput type="email" required [(ngModel)]="email" name="email" />
     </mat-form-field>
 
     <mat-form-field appearance="fill">
-      <mat-label>Password</mat-label>
+      <mat-label> {{'login.password'|translate}}</mat-label>
       <input
         matInput
         type="password"
@@ -23,7 +23,7 @@
       type="submit"
       [disabled]="loginForm.invalid"
     >
-      Login
+    {{'login.title'|translate}}
     </button>
   </form>
   <br>
@@ -33,7 +33,7 @@
     type="button"
     (click)="onGoogleSignIn()"
   >
-    Sign in with Google
+  {{'login.google_signin'|translate}}
   </button>
   <br>
   <button
@@ -42,7 +42,7 @@
     type="button"
     (click)="onResetPassword()"
   >
-    Forgot Password?
+  {{'login.forgot_password'|translate}}
   </button>
 
   <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>

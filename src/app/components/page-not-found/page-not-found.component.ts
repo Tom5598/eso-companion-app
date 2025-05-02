@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-page-not-found',
@@ -10,7 +11,7 @@ import { Router } from '@angular/router';
   imports: [
     MatButtonModule,
     CommonModule,
-    MatIcon,
+    MatIcon,TranslatePipe,
   ],
   templateUrl: './page-not-found.component.html',
   styleUrl: './page-not-found.component.scss'

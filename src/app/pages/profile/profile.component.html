@@ -1,6 +1,12 @@
 <mat-card class="profile-container">
-  <h2>My Profile</h2>
-
+  <mat-form-field appearance="outline" class="lang-select">
+    <mat-select [value]="selectedLang" (selectionChange)="switch($event.value)">
+      <mat-option *ngFor="let lang of langs" [value]="lang">
+        {{ lang.toUpperCase() }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <h2>{{ "profile.my_profile" | translate }}</h2>
   <div class="profile-pic-wrapper">
     <img
       [src]="userData?.photoURL ? userData.photoURL : defaultPicUrl"
@@ -27,74 +33,69 @@
   />
 
   <div *ngIf="userData">
-    <p><strong>Email:</strong> {{ user?.email }}</p>
-    <p><strong>Username:</strong> {{ userData.username }}</p>
-  </div> 
+    <p>
+      <strong>{{ "profile.email" | translate }}:</strong> {{ user?.email }}
+    </p>
+    <p>
+      <strong>{{ "profile.username" | translate }}:</strong>
+      {{ userData.username }}
+    </p>
+  </div>
   <mat-form-field appearance="fill" *ngIf="true">
-    <mat-label>Available Surveys</mat-label>
+    <mat-label>{{ "profile.available_surveys" | translate }}</mat-label>
     <mat-select (selectionChange)="onSelectSurvey($event.value)">
-      <mat-option
-        *ngFor="let s of incompleteSurveys$ | async"
-        [value]="s.id"
-      >
-        {{ s.name  }}
+      <mat-option *ngFor="let s of incompleteSurveys$ | async" [value]="s.id">
+        {{ s.name }}
       </mat-option>
       <mat-option
         *ngIf="(incompleteSurveys$ | async)?.length === 0"
         [disabled]="true"
-        >No survey available</mat-option>
+        >{{ "profile.no_survey_available" | translate }}</mat-option
+      >
     </mat-select>
   </mat-form-field>
-   
+
   <mat-tab-group class="notifications-tabs">
     <!-- Unread Tab -->
-    <mat-tab label="Unread">
+    <mat-tab label="{{ 'profile.unread' | translate }}">
       <div class="notification-list">
-        <ng-container *ngIf="(unread$ | async) as notifs; else noneUnread">
-          <div
-            class="notification-row"
-            *ngFor="let n of notifs"
-          >
+        <ng-container *ngIf="unread$ | async as notifs; else noneUnread">
+          <div class="notification-row" *ngFor="let n of notifs">
             <!-- 1) Icon Column -->
-            <mat-icon class="icon" color="primary" >
-              {{ n.type === 'warning' ? 'warning' : 'info' }}
+            <mat-icon class="icon" color="primary">
+              {{ n.type === "warning" ? "warning" : "info" }}
             </mat-icon>
-  
+
             <!-- 2) Content Column: date on top, message below -->
             <div class="content">
-              <div class="date">{{ n.date | date:'short' }}</div>
+              <div class="date">{{ n.date | date : "short" }}</div>
               <div class="message">{{ n.message }}</div>
             </div>
-  
+
             <!-- 3) Action Column -->
-            <button
-              mat-button
-              color="accent"
-              (click)="dismiss(n)"
-            >
-              Dismiss
+            <button mat-button color="accent" (click)="dismiss(n)">
+              {{ "profile.dismiss" | translate }}
             </button>
           </div>
         </ng-container>
         <ng-template #noneUnread>
-          <p class="no-notifs">No unread notifications.</p>
+          <p class="no-notifs">
+            {{ "profile.no_unread_notifications" | translate }}
+          </p>
         </ng-template>
       </div>
     </mat-tab>
 
     <!-- Read Tab -->
-    <mat-tab label="Read">
+    <mat-tab label="{{ 'profile.read' | translate }}">
       <div class="notification-list">
-        <ng-container *ngIf="(read$ | async) as notifs; else noneRead">
-          <div
-            class="notification-row"
-            *ngFor="let n of notifs"
-          >
+        <ng-container *ngIf="read$ | async as notifs; else noneRead">
+          <div class="notification-row" *ngFor="let n of notifs">
             <mat-icon class="icon" color="primary">
-              {{ n.type === 'warning' ? 'warning' : 'info' }}
+              {{ n.type === "warning" ? "warning" : "info" }}
             </mat-icon>
             <div class="content">
-              <div class="date">{{ n.date | date:'short' }}</div>
+              <div class="date">{{ n.date | date : "short" }}</div>
               <div class="message">{{ n.message }}</div>
             </div>
             <!-- no dismiss button in Read tab -->
@@ -102,11 +103,11 @@
           </div>
         </ng-container>
         <ng-template #noneRead>
-          <p class="no-notifs">No read notifications.</p>
+          <p class="no-notifs">
+            {{ "profile.no_read_notifications" | translate }}
+          </p>
         </ng-template>
       </div>
     </mat-tab>
   </mat-tab-group>
-   
-  
 </mat-card>

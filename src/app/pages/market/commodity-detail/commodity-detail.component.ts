@@ -19,6 +19,7 @@ import { Subscription }            from 'rxjs';
 import { Commodity } from '../../../models/commodity.model';
 import { CommodityService } from '../../../services/commodity.service';
 import { MatIcon } from '@angular/material/icon';
+import { TranslatePipe } from '@ngx-translate/core';
 Chart.register(...registerables);
 @Component({
   selector: 'app-commodity-detail',
@@ -29,7 +30,8 @@ Chart.register(...registerables);
     MatCardModule,
     MatButtonModule,
     MatSelectModule,
-    MatIcon
+    MatIcon,
+    TranslatePipe,
   ],
   templateUrl: './commodity-detail.component.html',
   styleUrl: './commodity-detail.component.scss'

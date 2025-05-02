@@ -10,7 +10,6 @@ import { switchMap, map } from 'rxjs/operators';
 import { User } from '../../models/user.model';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
-import { AdminService } from '../../services/admin.service';
 
 @Component({
   selector: 'app-profile-menu',
@@ -29,17 +28,12 @@ export class ProfileMenuComponent implements OnInit {
   private auth = inject(AuthService);
   private afs = inject(AngularFirestore);
   private router = inject(Router);
-  /** Firestore user profile data */
   user$!: Observable<User | null>;
-  /** Number of unread notifications */
   unreadCount$!: Observable<number>;
-  isAdmin$!: Observable<boolean>;
   constructor() {}
 
   ngOnInit() {
-    // 1) grab auth‑state → user profile doc
-    this.user$ = this.auth.user$; // from AuthService
-    this.isAdmin$ = this.auth.isAdmin$(); // from AdminService
+    this.user$ = this.auth.user$;
     // 2) count unread notifications in users/{uid}/notifications
     this.unreadCount$ = this.auth.getCurrentUserID().pipe(
       switchMap((uid) => {
@@ -55,12 +49,5 @@ export class ProfileMenuComponent implements OnInit {
   }
   goToProfile() {
     this.router.navigate(['/profile']);
-  }
-  goToAdminDashboard() {
-    this.router.navigate(['/admin']);
-  }
-  logout() {
-    this.auth.logout().subscribe();
-    this.router.navigate(['/home']);
   }
 }

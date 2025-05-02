@@ -10,6 +10,7 @@ import { MatDividerModule }  from '@angular/material/divider';
 import { ArticleService, ArticleItem } from '../../services/article.service';
 import { last, Observable, of, switchMap }   from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-article-detail',
@@ -21,7 +22,8 @@ import { AuthService } from '../../services/auth.service';
     MatIconModule,
     MatButtonModule,
     MatCardModule,
-    MatDividerModule
+    MatDividerModule,
+    TranslatePipe,
   ],
   templateUrl: './article-detail.component.html',
   styleUrl: './article-detail.component.scss'

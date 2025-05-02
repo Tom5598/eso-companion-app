@@ -34,24 +34,21 @@ import { ForumService } from '../../../services/forum.service';
 import { AuthService } from '../../../services/auth.service';
 import { Comment } from '../../../models/comment.model';
 import { ToDatePipe } from '../../../util/timestampt-to-date.pipe';
-import {
-  MatBottomSheet,
-  MatBottomSheetModule,
-} from '@angular/material/bottom-sheet';
+import { MatBottomSheet} from '@angular/material/bottom-sheet';
 import { CommentCreateComponent } from '../comment-create/comment-create.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { PostEditComponent } from '../post-edit/post-edit.component';
 import { MatIcon } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { LoadingIndicatorComponent } from '../../../components/loading-indicator/loading-indicator.component';
-import { CommodityPopupComponent } from '../../../components/commodity-popup/commodity-popup.component';
 import { CommodityService } from '../../../services/commodity.service';
-import { Commodity } from '../../../models/commodity.model';
-import { ChartConfiguration } from 'chart.js';
 import { CommodityNames } from '../../../models/commodity-names.model';
+import { TranslatePipe } from '@ngx-translate/core';
+
 type Token = { type: 'text' | 'commodity'; value: string , link : string};
+
 @Component({
   selector: 'app-post-detail',
   standalone: true,
@@ -63,7 +60,7 @@ type Token = { type: 'text' | 'commodity'; value: string , link : string};
     MatIcon,
     MatTooltipModule,
     MatChipsModule,
-    LoadingIndicatorComponent,RouterModule
+    LoadingIndicatorComponent,RouterModule,TranslatePipe,
   ],
   templateUrl: './post-detail.component.html',
   styleUrl: './post-detail.component.scss',
@@ -92,7 +89,7 @@ export class PostDetailComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private router: Router,
-    private commoditySvc: CommodityService
+    private commoditySvc: CommodityService,
   ) {}
 
   async ngOnInit() {

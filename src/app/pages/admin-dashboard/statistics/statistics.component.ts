@@ -17,6 +17,7 @@ import { Observable, Subscription, forkJoin, of }     from 'rxjs';
 import { switchMap, take, map }           from 'rxjs/operators';
 import { SurveyDefinition } from '../../../models/survey.model';
 import { SurveyService } from '../../../services/survey.service';
+import { TranslatePipe } from '@ngx-translate/core';
  
 @Component({
   selector: 'app-statistics',
@@ -28,7 +29,8 @@ import { SurveyService } from '../../../services/survey.service';
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    TranslatePipe,
   ],
   templateUrl: './statistics.component.html',
   styleUrl: './statistics.component.scss'
