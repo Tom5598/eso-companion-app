@@ -83,9 +83,6 @@ export class SurveyService {
         )
       );
   }
-
-  // === User Survey Answers ===
-
   /** Get all survey answers for a user */
   getUserAnswers(uid: string): Observable<UserSurveyAnswers | null> {
     return this.afs
@@ -145,21 +142,5 @@ export class SurveyService {
       }
     };
     return from(docRef.set(payload, { merge: true }));
-  }
-
-  /**
-   * Retrieve all user responses for a given survey across all users
-   */
-  getAllResponsess(surveyId: string): Observable<SurveyAnswerEntry[]> {
-    return this.afs
-      .collectionGroup<UserSurveyAnswers>('surveyanswers')
-      .valueChanges()
-      .pipe(
-        map(docs =>
-          docs
-            .map(doc => doc.entries?.[surveyId])
-            .filter((entry): entry is SurveyAnswerEntry => !!entry)
-        )
-      );
   }
 }

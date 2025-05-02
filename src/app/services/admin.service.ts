@@ -1,51 +1,49 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { from, map, Observable, switchMap, take } from 'rxjs';
+import { from, map, Observable, of, switchMap, take } from 'rxjs';
 import { User } from '../models/user.model';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 
-
-
-export interface AppUser { uid: string; email: string; disabled: boolean; }
-export interface Article { id: string; title: string; content: string; createdAt: Date; }
+export interface AppUser {
+  uid: string;
+  email: string;
+  disabled: boolean;
+}
+export interface Article {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: Date;
+}
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class AdminService { 
-
-  constructor(
-    private afs: AngularFirestore,
-    private afAuth: AngularFireAuth,
-    private storage: AngularFireStorage
-  ) {}
+export class AdminService {
+  constructor(private afs: AngularFirestore) {}
 
   // Bulk Email via Firestore 'mail' collection (Trigger Email)
   sendEmailToAll(subject: string, html: string): Observable<void> {
-    // Fetch the user list *once*
     return this.afs
-      .collection<{ email: string }>('users')
-      .valueChanges({ idField: 'uid' })
+      .collection('users')
+      .get()
       .pipe(
-        take(1), // <-- only the first emission
-        switchMap(users => {
-          // Deduplicate addresses
+        take(1), // ensure we only process it once
+        switchMap((snapshot) => {
           const emails = Array.from(
-            new Set(users.map(u => u.email))
+            new Set(
+              snapshot.docs
+                .map((doc) => (doc.data() as { email: string }).email)
+                .filter((e) => !!e)
+            )
           );
-
-          // Batch all writes
           const batch = this.afs.firestore.batch();
           const mailCol = this.afs.firestore.collection('mail');
-          emails.forEach(emailAddr => {
-            const docRef = mailCol.doc(); 
-            batch.set(docRef, {
-              to: emailAddr,
-              message: { subject, html }
-            });
+          emails.forEach((emailAddr) => {
+            const docRef = mailCol.doc();
+            batch.set(docRef, { to: emailAddr, message: { subject, html } });
           });
 
-          // Commit as a single promise
           return from(batch.commit());
         })
       );
@@ -53,7 +51,7 @@ export class AdminService {
 
   searchUsers(prefix: string): Observable<User[]> {
     return this.afs
-      .collection<User>('users', ref => {
+      .collection<User>('users', (ref) => {
         let q = ref.orderBy('username').limit(10);
         if (prefix) {
           const end = prefix + '\uf8ff';
@@ -68,5 +66,4 @@ export class AdminService {
   setUserDisabled(uid: string, disabled: boolean): Observable<void> {
     return from(this.afs.doc(`users/${uid}`).update({ disabled }));
   }
- 
 }

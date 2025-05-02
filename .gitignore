@@ -46,3 +46,4 @@ src/app/helpers
 /.firebase
 /.firebase/esp-companion-app-89474/hosting
 .firebase/*
+users.json

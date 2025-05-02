@@ -2,18 +2,235 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+  
+ 		// ─────────────────────────────────────────────────
+    // 0) Admin collectionGroup catch‐all for surveyanswers
+    //    Allows admin to read ANY surveyanswers, anywhere.
+    match /{any=**}/surveyanswers/{answerId} {
+      allow get, list: if request.auth != null
+        && request.auth.token.admin == true;
+    }
+    match /{any=**} {
+      allow get, list: if request.auth != null
+        && request.auth.token.admin == true;
+    }
+    // ─────────────────────────────────────────────────
+    // Users collection
+    match /users/{userId} {
+      // 1 Reads: owner or admin
+      allow get,list: if request.auth != null && (
+        request.auth.uid == userId
+        || request.auth.token.admin == true
+      );
+			
+      // 2 Create: only the owner can create their profile
+      allow create: if request.auth != null
+        && request.auth.uid == userId;
 
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
+      // 3 Update:
+      //    • Owner may update any of their own fields
+      //    • Admin may update ONLY the 'disabled' field
+       allow update: if request.auth != null && (
+        // owner full‐update
+        request.auth.uid == userId
+        ||
+        // admin may only update the 'disabled' field
+        (
+          request.auth.token.admin == true
+          && request.resource.data.diff(resource.data).changedKeys().hasOnly(['disabled'])
+        )
+      );
+
+		}
+
+    // ─────────────────────────────────────────────────
+    // 2 utils subcollection
+    //    Only the owning user may read or write their utils docs
+    match /users/{userId}/utils/{utilDoc} {
+      allow read, write: if request.auth != null
+        && request.auth.uid == userId;
+    }
+
+
+
+    // ─────────────────────────────────────────────────
+    // 3 surveyanswers subcollection
+    //    - The owning user may read/write their own answers
+    //    - Admins may read anyone’s answers
+    match /users/{userId}/surveyanswers/{answerId} {
+      // The owner may read/create/update/delete their own answers
+      allow read, create, update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+
+    // ─────────────────────────────────────────────────
+    // 4 notifications subcollection
+    //    - The owning user may read and write their notifications
+    //    - Any authenticated user may create (write) new notifications
+    match /users/{userId}/notifications/{noteId} {
+      // allow the user to read their own notifications
+      allow get, list: if request.auth != null
+        && request.auth.uid == userId;
+
+      // allow create/update/delete if:
+      //   • user themselves, or
+      //   • any other authenticated user (for sending notifications)
+      allow create, update, delete: if request.auth != null;
+    }
+    
+    
+    
+		// ─────────────────────────────────────────────────
+    // Articles collection
+    // Everyone may read (get & list) articles,
+    // only admins (custom claim `admin: true`) may create/update/delete.
+    match /articles/{articleId} {
+      // public reads
+      allow get, list: if true;
+
+      // admin writes
+      allow create, update, delete: if request.auth != null
+        && request.auth.token.admin == true;
+    }
+    
+    
+    
+    // ─────────────────────────────────────────────────
+    // Commodities collection
+    // Only signed-in users may read; client-side writes are blocked.
+    // Cloud Functions (Admin SDK) can still create/update/delete.
+    match /commodities/{commodityId} {
+      // any authenticated user can list or get commodity docs
+      allow list, get: if request.auth != null;
+
+      // no client-side writes
+      allow create, update, delete: if false;
+    }
+    
+    
+    
+    // ─────────────────────────────────────────────────
+    // Surveys collection
+    // Any signed-in user may read (list & get),
+    // only admins (custom claim `admin: true`) may create/update/delete.
+    match /surveys/{surveyId} {
+      // authenticated reads
+      allow list, get: if request.auth != null;
+
+      // admin writes
+      allow create, update, delete: if request.auth != null
+        && request.auth.token.admin == true;
+    }
+    
+    
+    // ─────────────────────────────────────────────────
+    // Mail collection
+    // Only admins may create (write) mail documents.
+    // All reads, updates, and deletes are reserved for server-side Cloud Functions.
+    match /mail/{mailId} {
+      // allow only admins to create mail documents
+      allow create: if request.auth != null
+        && request.auth.token.admin == true;
+
+      // disallow client-side reads, updates, and deletes
+      allow get, list, update, delete: if false;
+    }
+    
+    
+    
+    // ─────────────────────────────────────────────────
+    // Top-level utils collection
+    // Anyone (even unauthenticated) may read utils documents,
+    // but only admins may create, update, or delete them.
+    match /utils/{utilDocId} {
+      // public read access
+      allow get, list: if true;
+
+      // admin-only writes
+      allow create, update, delete: if request.auth != null
+        && request.auth.token.admin == true;
+    }
+    
+    
+     // ─────────────────────────────────────────────────
+    // Forum top‐level
+    match /forum/{forumId} {
+      // public read
+      allow get, list: if true;
+
+      // create post
+      allow create: if request.auth != null
+        && request.resource.data.authorId == request.auth.uid;
+
+      // update post
+      allow update: if request.auth != null && (
+        // 1) author editing (only when unlocked)
+        ( request.auth.uid == resource.data.authorId
+          && resource.data.isLocked != true
+        )
+        // 2) bump counts (only when unlocked)
+        || ( resource.data.isLocked != true
+             && request.resource.data.diff(resource.data)
+                  .changedKeys()
+                  .hasOnly(['commentCount','likeCount'])
+           )
+        // 3) admin toggling lock
+        || ( request.auth.token.admin == true
+             && request.resource.data.diff(resource.data)
+                  .changedKeys()
+                  .hasOnly(['isLocked'])
+           )
+      );
+
+      // delete post
+      allow delete: if request.auth != null && (
+        // author may delete own when unlocked
+        ( request.auth.uid == resource.data.authorId
+          && resource.data.isLocked != true
+        )
+        // admin may delete any
+        || request.auth.token.admin == true
+      );
+
+      // ─────────────────────────────────────────────────
+      // Comments subcollection
+      match /comments/{commentId} {
+        // public read
+        allow get, list: if true;
+
+        // helper to see if the parent post is locked
+        function postLocked() {
+          return get(
+            /databases/$(database)/documents/forum/$(forumId)
+          ).data.isLocked == true;
+        }
+
+        // create comment if not locked
+        allow create: if request.auth != null
+          && request.resource.data.authorId == request.auth.uid
+          && !postLocked();
+
+        // delete comment if not locked:
+        //   • author can delete own
+        //   • admin can delete any
+        allow delete: if request.auth != null
+          && !postLocked()
+          && (
+               request.auth.uid == resource.data.authorId
+            || request.auth.token.admin == true
+          );
+
+        // no client‐side updates to comments
+        allow update: if false;
+      }
+    }
+    
+    
+    
+    // ─────────────────────────────────────────────────
+    // 5 Deny everything else by default
     match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2025, 2, 25);
+      allow read, write: if false;
     }
   }
 }
