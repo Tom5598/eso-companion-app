@@ -8,6 +8,7 @@ import {
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatButtonModule } from '@angular/material/button';
 import { TranslatePipe } from '@ngx-translate/core';
+import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
 
 export interface PickerItem {
   name: string;
@@ -34,11 +35,11 @@ export interface PickerData {
 export class ItemPickerComponent {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: PickerData,
-    private dialogRef: MatDialogRef<ItemPickerComponent>
+    private dialogRef: MatDialogRef<ItemPickerComponent>, private analytics: AngularFireAnalytics,
   ) {}
 
-  select(arg0: string) {
-    console.log('Selected item:', arg0);
+  select(arg0: string, itemName: string) {
+    this.analytics.logEvent('select_character_equipment', { equipment_id: itemName });
     this.dialogRef.close(arg0);
   }
 }

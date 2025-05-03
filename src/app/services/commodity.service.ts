@@ -4,14 +4,13 @@ import { map, Observable, of, tap } from 'rxjs';
 import { Commodity, CommodityFilter } from '../models/commodity.model';
 import { CommodityNames } from '../models/commodity-names.model';
 import firebase from 'firebase/compat/app'; 
+import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CommodityService {
-  constructor(private afs: AngularFirestore) {
-    console.log('CommodityService initialized');
-  }
+  constructor(private afs: AngularFirestore, private analytics: AngularFireAnalytics) { }
 
   // Master list of names for autocomplete
   getCommodityNames(): Observable<CommodityNames[]> {
@@ -19,26 +18,6 @@ export class CommodityService {
       .doc<{ commodityNames: CommodityNames[] }>('utils/misc')
       .valueChanges()
       .pipe(map((doc) => doc?.commodityNames ?? []));
-  }
-
-  // Fetch one commodity by name
-  getCommodityByName(name: string): Observable<Commodity> {
-    console.log('Fetching commodity by name:', name);
-
-    return this.afs
-      .collection<Commodity>('commodities', (ref) =>
-        ref.where('name', '==', name)
-      )
-      .valueChanges({ idField: 'id' })
-      .pipe(
-        map((arr) => {
-          if (!arr.length) throw new Error(`No commodity "${name}"`);
-          return arr[0];
-        }),
-        tap((c) => {
-          console.log('Fetched commodity:', c);
-        })
-      );
   }
 
   queryCommodities(filters: CommodityFilter): Observable<Commodity[]> {
@@ -93,6 +72,7 @@ export class CommodityService {
       );
   }
   getByName(name: string): Observable<Commodity | undefined> {
+    this.analytics.logEvent('select_item', { item_id: name });
     return this.afs
       .collection<Commodity>('commodities', (ref) =>
         ref.where('name', '==', name).limit(1)

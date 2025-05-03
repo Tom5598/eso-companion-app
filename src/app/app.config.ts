@@ -30,6 +30,7 @@ import { connectFirebaseEmulators } from './util/emulator-setup';
 import { HttpClient, provideHttpClient } from '@angular/common/http';
 import { MissingTranslationHandler, TranslateLoader, provideTranslateService } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './i18n/', '.json');
@@ -60,7 +61,7 @@ export const appConfig: ApplicationConfig = {
       AngularFirestoreModule,
       BrowserAnimationsModule,
       AngularFireStorageModule,
-      AngularFireFunctionsModule
+      AngularFireFunctionsModule,AngularFireAnalyticsModule,
     ),
     {
       provide: APP_INITIALIZER,

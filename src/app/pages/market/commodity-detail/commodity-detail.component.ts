@@ -53,7 +53,7 @@ export class CommodityDetailComponent implements OnInit, OnDestroy, AfterViewIni
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private svc: CommodityService
+    private svc: CommodityService,
   ) {}
   ngAfterViewInit() {
     // At this point historyCtx and regionCtx are guaranteed to exist
