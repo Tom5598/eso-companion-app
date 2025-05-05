@@ -27,11 +27,9 @@ export const httpSetAdmin = functions.https.onRequest(async (req, res) => {
 export const notifyNewSurvey = onDocumentCreated(
   'surveys/{surveyId}',
   async (event) => {
-    const survey = event.params.surveyId;
-    if (!survey) return;
-
-    const title = event.data?.data()?.title || 'New Survey';
     const surveyId = event.params.surveyId;
+    if (!surveyId) return;
+    const title = event.data?.data()?.title || 'New Survey';
 
     // 1) Fetch all user emails once
     const usersSnap = await admin.firestore().collection('users').get();
@@ -51,22 +49,66 @@ export const notifyNewSurvey = onDocumentCreated(
       batch.set(docRef, {
         to: email,
         message: {
-          subject: `New Survey Available: ${title}`,
+          subject: `New Survey Available On ESO Companion-App`,
           html: `
-            <p>Hello,</p>
-            <p>A new survey titled "<strong>${title}</strong>" has been published.</p>
-            <p>
-              Please fill it out here:
-              <a href="https://eso-companion-app-89474.web.app//surveys/${surveyId}">
-                Take the Survey
-              </a>
-            </p>
-            <p>Thank you!</p>
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <title>Survey Notification</title>
+            </head>
+            <body style="margin:0; padding:0; background-color:#f5f5f5;">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#f5f5f5;">
+                <tr>
+                  <td align="center" style="padding:20px 0;">
+                    <!-- Container -->
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; background-color:#ffffff; border-radius:8px; overflow:hidden; font-family:Arial, sans-serif;">
+                      
+                      <!-- Header -->
+                      <tr>
+                        <td style="background-color:#0052cc; padding:20px; text-align:center;">
+                          <h1 style="color:#ffffff; margin:0; font-size:22px; line-height:1.2;">Survey Notification</h1>
+                        </td>
+                      </tr>
+                      
+                      <!-- Body -->
+                      <tr>
+                        <td style="padding:20px; color:#333333; font-size:16px; line-height:1.5;">
+                          <p style="margin-top:0;">Hello,</p>
+                          <p>A new survey has been published.</p>
+                          <p>Please fill it out by clicking the button below:</p>
+                          
+                          <!-- Button -->
+                          <p style="text-align:center; margin:30px 0;">
+                            <a href="https://eso-companion-app-89474.web.app/survey/${surveyId}"
+                              style="background-color:#0052cc; color:#ffffff; text-decoration:none; padding:12px 24px; border-radius:4px; display:inline-block; font-weight:bold; font-size:16px;">
+                              Take the Survey
+                            </a>
+                          </p>
+                          
+                          <p>Thank you!</p>
+                        </td>
+                      </tr>
+                      
+                      <!-- Footer -->
+                      <tr>
+                        <td style="background-color:#f0f0f0; padding:15px 20px; font-size:12px; color:#777777; text-align:center;">
+                          <p style="margin:0;">&copy; 2025 Your Company. All rights reserved.</p>
+                          <p style="margin:5px 0 0;">1234 Main St, Suite 100, City, Country</p>
+                        </td>
+                      </tr>
+                      
+                    </table>
+                    <!-- End Container -->
+                  </td>
+                </tr>
+              </table>
+            </body>
+            </html>
           `,
         },
       });
     });
-
     // 3) Commit
     await batch.commit();
   }
@@ -112,7 +154,7 @@ export const purgeReadNotifications = functions.pubsub.onMessagePublished(
     if (snapshot.empty) return;
     let batch = db.batch();
     let count = 0;
-    snapshot.docs.forEach(doc => {
+    snapshot.docs.forEach((doc) => {
       batch.delete(doc.ref);
       count++;
       if (count === 500) {
