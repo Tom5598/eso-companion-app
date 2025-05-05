@@ -21,8 +21,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { PostFilterOptions } from '../../models/post-filter-options.model';
 import { MatFormField, MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatNativeDateModule, MatOption } from '@angular/material/core';
-import {MatDatepickerModule, MatDateSelectionModel} from '@angular/material/datepicker';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
+import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatSelectModule} from '@angular/material/select';
@@ -30,6 +29,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { LoadingIndicatorComponent } from "../../components/loading-indicator/loading-indicator.component";
 import { TranslatePipe } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-forum',
   standalone: true,
@@ -60,6 +60,7 @@ export class ForumComponent {
   readonly auth = inject(AuthService);
   private fb = inject(FormBuilder);
   private bo   = inject(BreakpointObserver);
+  private forumService = inject(ForumService);
   posts$!: Observable<Post[]>;
   user :any;
   filterForm: any;
@@ -67,7 +68,7 @@ export class ForumComponent {
   showFilters = true; 
   viewMode: 'list' | 'grid' = 'list';
 
-  constructor(private afs: AngularFirestore) {
+  constructor() {
     this.filterForm = this.fb.group({
       titleFilter:    [''],      
       dateOrder:      ['desc'],
@@ -82,10 +83,7 @@ export class ForumComponent {
   async ngOnInit() {
     this.posts$ = this.forum.getLatestForumPosts();
     this.user = await firstValueFrom(this.auth.getCurrentUser().pipe(take(1)));
-    this.tags$ = this.afs
-      .doc<{ tags: string[] }>('utils/hashtags')
-      .valueChanges()
-      .pipe(map(doc => doc?.tags || []));      
+    this.tags$ = this.forumService.getHastags();      
   }
   toggleView(mode: 'list' | 'grid') {
        this.viewMode = mode;

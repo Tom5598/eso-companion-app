@@ -36,6 +36,10 @@
 
   <!-- Logged-in-only -->
   <ng-container *ngIf="user$ | async">
+    <button mat-menu-item routerLink="/profile">
+      <mat-icon>person</mat-icon>
+      <span>{{'navbar.profile'|translate}}</span>
+    </button>
     <button mat-menu-item routerLink="/market">
       <mat-icon>storefront</mat-icon>
       <span>{{'navbar.market'|translate}}</span>

@@ -77,10 +77,7 @@ export class PostDetailComponent implements OnInit {
   contentTokens: {type: 'text' | 'commodity'; value: string; link?: string}[] = [];
   isAdmin$!: Observable<boolean> ;
   isAdmin: boolean = false;
-  @Output()
-  postEdited = new EventEmitter<Post>();
-  @Output()
-  postDeleted = new EventEmitter<Post>();
+
   constructor(
     private route: ActivatedRoute,
     private forum: ForumService,
@@ -95,7 +92,7 @@ export class PostDetailComponent implements OnInit {
   async ngOnInit() {
     this.postId = this.route.snapshot.paramMap.get('id')!;
     this.isAdmin$ = this.auth.isAdmin$();
-    // 1) Grab your name→link list exactly once
+    // 1) Grab name→link list once
     const names$: Observable<CommodityNames[]> =
       this.commoditySvc
         .getCommodityNames()
@@ -109,7 +106,6 @@ export class PostDetailComponent implements OnInit {
       // 3) On every emission, build the lookup map & tokenize
       tap(([post, names]) => {
         if (!post) {
-          // no such doc → 404
           this.router.navigate(['/not-found']);
           return;
         }
@@ -119,14 +115,11 @@ export class PostDetailComponent implements OnInit {
         for (const n of names) {
           lookup[n.name] = n.link;
         }
-
         // split + enrich tokens
         this.contentTokens = this.tokenize(post.content, lookup);
       }),
-
       // 4) throw away any null post, so downstream sees only Post
       filter((pair): pair is [Post, CommodityNames[]] => pair[0] !== null),
-
       // 5) map back to the Post itself
       map(([post]) => post)
     );
@@ -156,8 +149,7 @@ export class PostDetailComponent implements OnInit {
     });
   }
   
-  private tokenize(text: string, lookup: Record<string, string>): Token[] {
-    
+  private tokenize(text: string, lookup: Record<string, string>): Token[] {    
     // split on $word tokens
     const parts = text.split(/(\$[A-Za-z]+)/g);
     return parts.map((p) => {

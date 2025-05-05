@@ -8,7 +8,6 @@ import { MatListModule } from '@angular/material/list';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-
 import { AdminService } from '../../../services/admin.service';
 import { User } from '../../../models/user.model';
 import { Observable } from 'rxjs';

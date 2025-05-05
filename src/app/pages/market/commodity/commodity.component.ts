@@ -45,7 +45,6 @@ export class CommodityComponent implements OnChanges, OnDestroy, AfterViewInit {
   @ViewChild('chart') canvas!: ElementRef<HTMLCanvasElement>;
   private chart?: Chart;
   ngAfterViewInit() {
-    // Only now is canvas.nativeElement guaranteed
     if (this.commodity) {
       this.renderChart();
     }

@@ -37,14 +37,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   isLoggedIn = false;
   user$!: Observable<User | null>;
-  /** Number of unread notifications */
   isAdmin$!: Observable<boolean>;
   constructor() {}
 
   ngOnInit() {
-    // 1) grab auth‑state → user profile doc
-    this.user$ = this.auth.user$; // from AuthService
-    this.isAdmin$ = this.auth.isAdmin$(); // from AdminService
+    this.user$ = this.auth.user$;
+    this.isAdmin$ = this.auth.isAdmin$();
     
   }
   goToAdminDashboard() {

@@ -32,6 +32,7 @@ import { Survey } from '../../models/survey.model';
 import { Router } from '@angular/router';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '@ngx-translate/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Component({
@@ -69,7 +70,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private userSvc: UserService,
     private surveySvc: SurveyService,
     private router: Router,
-    private i18n: TranslationService
+    private i18n: TranslationService,
+    private snackBar: MatSnackBar
   ) {
     this.selectedLang = this.i18n.getCurrentLang(); 
   }
@@ -143,12 +145,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
     // Validation
     const validTypes = ['image/png', 'image/jpeg'];
     if (!validTypes.includes(file.type)) {
-      alert('Please select a PNG or JPEG image.');
+      this.snackBar.open('Please select a PNG or JPEG image.', 'Dismiss',{duration:2000} );
       return;
     }
     const isValidDimensions = await this.checkImageDimensions(file, 256, 256);
     if (!isValidDimensions) {
-      alert('Image must not exceed 256x256 pixels.');
+      this.snackBar.open('Image must not exceed 256x256 pixels.', 'Dismiss',{duration:2000} );
       return;
     }
     //Upload to "profiles/{uid}/"

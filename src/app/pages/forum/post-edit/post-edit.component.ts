@@ -1,9 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { Post } from '../../../models/post.model';
 import { CommonModule } from '@angular/common';
-import { MatFormField, MatFormFieldControl, MatLabel } from '@angular/material/form-field';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { ForumService } from '../../../services/forum.service';
 import { catchError, of } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
@@ -48,8 +48,6 @@ export class PostEditComponent {
     const changes: Partial<Post> = {
       title: this.form.value.title,
       content: this.form.value.content,
-  
-      // mark as edited, and stamp the new edit time
       isEdited: true,
       updatedAt: new Date()
     };
@@ -70,10 +68,5 @@ export class PostEditComponent {
         this.dialogRef.close(updated);
       });
     }
-
-
-
-
-
 
 }

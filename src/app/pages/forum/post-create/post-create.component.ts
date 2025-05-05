@@ -33,7 +33,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Post } from '../../../models/post.model';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import 'firebase/compat/firestore';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -64,7 +63,6 @@ import { TranslatePipe } from '@ngx-translate/core';
 export class PostCreateComponent implements OnInit {
   private fb = inject(FormBuilder);
   private forumService = inject(ForumService);
-  private afs = inject(AngularFirestore);
   private auth = inject(AuthService);
   private router = inject(Router);
   private commoditySvc = inject(CommodityService);
@@ -74,22 +72,6 @@ export class PostCreateComponent implements OnInit {
   postID: string = '';
   maxTags = 10;
   commodityNames: CommodityNames[] = [];
-
-  ngOnInit(): void {
-    this.postID = this.afs.createId();
-    this.tags$ = this.afs
-      .doc<{ tags: string[] }>('utils/hashtags')
-      .valueChanges()
-      .pipe(map((doc) => doc?.tags || []));
-    this.commoditySvc.getCommodityNames().subscribe((names) => {
-      this.commodityNames = names;
-    });
-    // 2) Watch content and validate on each change (debounced)
-    this.form
-      .get('content')!
-      .valueChanges.pipe(debounceTime(1000))
-      .subscribe((text) => this._validateCommodities(text || ''));
-  }
   form = this.fb.group({
     title: [
       '',
@@ -105,21 +87,32 @@ export class PostCreateComponent implements OnInit {
     ],
     hashtags: this.fb.control<string[]>([]),
   });
+  ngOnInit(): void {
+    this.postID = this.forumService.getUniqueForumPostId();
+    this.tags$ = this.forumService.getHastags();
+    this.commoditySvc.getCommodityNames().subscribe((names) => {
+      this.commodityNames = names;
+    });
+    // 2) Watch content and validate on each change (debounced)
+    this.form
+      .get('content')!
+      .valueChanges.pipe(debounceTime(1000))
+      .subscribe((text) => this._validateCommodities(text || ''));
+  }
+  
   private _validateCommodities(text: string) {
     // regex to find $word tokens ending with space or end-of-string
     const regex = /(\$[A-Za-z]+)(?=\s|$)/g;
     let match: RegExpExecArray | null;
     let cleaned = text;
-  
+
     while ((match = regex.exec(text))) {
-      const token  = match[1];        // e.g. "$wood"
-      const symbol = token.substring(1) ;
-  
+      const token = match[1]; // e.g. "$wood"
+      const symbol = token.substring(1);
+
       // look for a matching commodity name (case-insensitive)
-      const exists = this.commodityNames.some(
-        c => c?.name   === symbol
-      );
-      console.log(`Checking whether "${symbol}" exists...`, exists);      
+      const exists = this.commodityNames.some((c) => c?.name === symbol);
+      console.log(`Checking whether "${symbol}" exists...`, exists);
       if (!exists) {
         // strip out invalid token
         cleaned = cleaned.replace(token, '');
@@ -128,13 +121,12 @@ export class PostCreateComponent implements OnInit {
         });
       }
     }
-  
+
     // if we removed anything, update control without retriggering validation
     if (cleaned !== text) {
       this.form.get('content')!.setValue(cleaned, { emitEvent: false });
     }
-  }
-  /** local file list & thumbnails */
+  } 
   files: File[] = [];
   previews: string[] = [];
   uploading = false;
@@ -146,19 +138,34 @@ export class PostCreateComponent implements OnInit {
     if (!input.files) return;
 
     Array.from(input.files).forEach((file) => {
-      if (this.files.length >= 10) return;
-      if (!['image/png', 'image/jpeg'].includes(file.type)) return;
+      if (this.files.length >= 10) {
+        this.snackBar.open('You can upload maximum 10 pictures.', 'Dismiss', {
+          duration: 2000,
+        });
+        return;
+      }
+      if (!['image/png', 'image/jpeg'].includes(file.type)) {
+        this.snackBar.open('Only PNG and JPEG files are allowed.', 'Dismiss', {
+          duration: 2000,
+        });
+        return;
+      }
 
       const img = new Image();
       img.onload = () => {
         if (img.width <= 1920 && img.height <= 1080) {
           this.files.push(file);
           this.previews.push(URL.createObjectURL(file));
+        } else {
+          this.snackBar.open(
+            'Image dimensions must be less than 1920x1080.',
+            'Dismiss',
+            { duration: 2000 }
+          );
         }
       };
       img.src = URL.createObjectURL(file);
     });
-
     // reset input so same file can be re‑selected
     input.value = '';
   }
@@ -178,9 +185,7 @@ export class PostCreateComponent implements OnInit {
       alert('You must be logged in to post.');
       return;
     }
-
     // Build the minimal draft
-    const now = new Date();
     const draft = {
       id: this.postID,
       title: this.form.value.title!,
@@ -191,13 +196,10 @@ export class PostCreateComponent implements OnInit {
     } as Partial<Post>;
 
     this.uploading = true;
-
-    // Call the new service method
     this.forumService
       .createPostWithImages(draft, this.postID, this.files)
       .pipe(
         tap((post) => {
-          console.log('Created post with images:', post);
           this.router.navigate(['/forum', post.id]);
         }),
         catchError((err) => {
@@ -209,6 +211,7 @@ export class PostCreateComponent implements OnInit {
       )
       .subscribe();
   }
+
   toggleTag(tag: string) {
     const tags: string[] = this.form.value.hashtags || [];
     const idx = tags.indexOf(tag);
@@ -216,8 +219,9 @@ export class PostCreateComponent implements OnInit {
       tags.splice(idx, 1);
     } else {
       if (tags.length >= this.maxTags) {
-        // optional: notify the user
-        alert(`You can select up to ${this.maxTags} tags.`);
+        this.snackBar.open('You can select maximum 10 tags.', 'Dismiss', {
+          duration: 2000,
+        });
         return;
       }
       tags.push(tag);

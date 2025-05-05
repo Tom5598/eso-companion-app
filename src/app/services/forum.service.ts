@@ -29,12 +29,22 @@ import { Notification } from '../models/notification.model';
   providedIn: 'root',
 })
 export class ForumService {
-  
   constructor(
     private afs: AngularFirestore,
     private storage: AngularFireStorage
   ) {}
   //READ
+  getUniqueForumPostId(): string {
+    return this.afs.createId();
+  }
+  getHastags(): Observable<string[]> {
+    return this.afs
+      .doc<{ tags: string[] }>('utils/hashtags')
+      .valueChanges()
+      .pipe(
+        map((doc) => doc?.tags || [])
+      );
+  }
   getLatestForumPosts(): Observable<Post[]> {
     return this.afs
       .collection('forum', (ref) => ref.orderBy('createdAt', 'desc').limit(25))
@@ -105,7 +115,7 @@ export class ForumService {
     );
   }
   //CREATE
-   
+
   updatePost(postID: string, changes: Partial<Post>): Observable<void> {
     // Use backticks, not a literal string
     const ref = this.afs.doc(`forum/${postID}`);
@@ -296,6 +306,8 @@ export class ForumService {
     );
   }
   toggleLockPost(postID: string, isLocked: boolean): Observable<void> {
-    return from(this.afs.doc(`forum/${postID}`).update({ isLocked: !isLocked }));
+    return from(
+      this.afs.doc(`forum/${postID}`).update({ isLocked: !isLocked })
+    );
   }
 }
