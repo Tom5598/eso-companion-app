@@ -35,9 +35,10 @@ import { TranslatePipe } from '@ngx-translate/core';
 export class NavbarComponent implements OnInit, OnDestroy {
   private auth = inject(AuthService);
   private router = inject(Router);
-  isLoggedIn = false;
+
   user$!: Observable<User | null>;
   isAdmin$!: Observable<boolean>;
+  
   constructor() {}
 
   ngOnInit() {
@@ -52,7 +53,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   onLogout() {
     this.auth.logout().subscribe(() => {
-      this.isLoggedIn = false;
       this.router.navigate(['/home']);
     });
   }

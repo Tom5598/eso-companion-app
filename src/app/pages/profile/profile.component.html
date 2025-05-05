@@ -59,7 +59,7 @@
     <!-- Unread Tab -->
     <mat-tab label="{{ 'profile.unread' | translate }}">
       <div class="notification-list">
-        <ng-container *ngIf="unread$ | async as notifs; else noneUnread">
+        <ng-container *ngIf="unread$ | async as notifs">
           <div class="notification-row" *ngFor="let n of notifs">
             <!-- 1) Icon Column -->
             <mat-icon class="icon" color="primary">
@@ -78,18 +78,18 @@
             </button>
           </div>
         </ng-container>
-        <ng-template #noneUnread>
-          <p class="no-notifs">
-            {{ "profile.no_unread_notifications" | translate }}
-          </p>
-        </ng-template>
+          <div *ngIf="(unread$ | async)?.length === 0">
+            <p class="no-notifs">
+              {{ "profile.no_unread_notifications" | translate }}
+            </p>
+          </div>      
       </div>
     </mat-tab>
 
     <!-- Read Tab -->
     <mat-tab label="{{ 'profile.read' | translate }}">
       <div class="notification-list">
-        <ng-container *ngIf="read$ | async as notifs; else noneRead">
+        <ng-container *ngIf="read$ | async as notifs">
           <div class="notification-row" *ngFor="let n of notifs">
             <mat-icon class="icon" color="primary">
               {{ n.type === "warning" ? "warning" : "info" }}
@@ -101,12 +101,13 @@
             <!-- no dismiss button in Read tab -->
             <span class="spacer"></span>
           </div>
+          
         </ng-container>
-        <ng-template #noneRead>
+        <div #noneRead *ngIf="(read$ | async)?.length === 0">
           <p class="no-notifs">
             {{ "profile.no_read_notifications" | translate }}
           </p>
-        </ng-template>
+        </div>
       </div>
     </mat-tab>
   </mat-tab-group>

@@ -1,5 +1,5 @@
 <mat-toolbar color="primary" class="navbar-container">
-  <span class="spacer"></span>
+  <span class="spacer" *ngIf="!(user$ | async)"></span>
 
   <!-- Centered menu icon -->
   <img
