@@ -29,8 +29,6 @@ export const notifyNewSurvey = onDocumentCreated(
   async (event) => {
     const surveyId = event.params.surveyId;
     if (!surveyId) return;
-    const title = event.data?.data()?.title || 'New Survey';
-
     // 1) Fetch all user emails once
     const usersSnap = await admin.firestore().collection('users').get();
     const emails = Array.from(
