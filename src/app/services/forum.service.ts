@@ -33,10 +33,17 @@ export class ForumService {
     private afs: AngularFirestore,
     private storage: AngularFireStorage
   ) {}
-  //READ
+  /**
+   * @description This method generates a unique ID for a forum post using the createId() method from AngularFirestore.
+   * @returns "A unique ID for a forum post"
+   */
   getUniqueForumPostId(): string {
     return this.afs.createId();
   }
+  /**
+   * @description Fetches the available hashtags from Firestore. It retrieves the document from the utils collection and maps the tags field to an array of strings.
+   * @returns An observable of the hashtags
+   */
   getHastags(): Observable<string[]> {
     return this.afs
       .doc<{ tags: string[] }>('utils/hashtags')
@@ -45,17 +52,31 @@ export class ForumService {
         map((doc) => doc?.tags || [])
       );
   }
+  /**
+   * @description Fetches the latest 25 forum posts from Firestore. It orders the results by createdAt in descending order and maps the createdAt field to a Date object if it is not already one.
+   * @returns An observable of the forum posts
+   */
   getLatestForumPosts(): Observable<Post[]> {
     return this.afs
       .collection('forum', (ref) => ref.orderBy('createdAt', 'desc').limit(25))
       .get()
       .pipe(map((snaps) => convertSnapsToType<Post>(snaps)));
   }
+  /**
+   * @description Fetches a single forum post from Firestore by its ID. It maps the createdAt field to a Date object if it is not already one.
+   * @param id The ID of the forum post to fetch
+   * @returns An observable of the forum post
+   */
   getForumPostById(id: string): Observable<Post> {
     return this.afs
       .doc<Post>(`forum/${id}`)
       .valueChanges({ idField: 'id' }) as Observable<Post>;
   }
+  /**
+   * @description Fetches the comments for a specific forum post from Firestore. It orders the results by createdAt in descending order and maps the createdAt field to a Date object if it is not already one.
+   * @param id The ID of the forum post to fetch comments for
+   * @returns An observable of the comments
+   */
   getForumPostComments(id: string): Observable<Comment[]> {
     return this.afs
       .collection('forum')
@@ -63,18 +84,33 @@ export class ForumService {
       .collection('comments', (ref) => ref.orderBy('createdAt', 'desc'))
       .valueChanges({ idField: 'id' }) as Observable<Comment[]>;
   }
+  /**
+   * @description Fetches the comments for a specific forum post from Firestore. It orders the results by createdAt in descending order and maps the createdAt field to a Date object if it is not already one.
+   * @param id The ID of the forum post to fetch comments for
+   * @returns An observable of the comments
+   */
   getForumCommentsByUser(userID: string): Observable<Comment[]> {
     return this.afs
       .collectionGroup('comments', (ref) => ref.where('author', '==', userID))
       .get()
       .pipe(map((snaps) => convertSnapsToType<Comment>(snaps)));
   }
+  /**
+   * @description Fetches the forum posts created by a specific user from Firestore. It orders the results by createdAt in descending order and maps the createdAt field to a Date object if it is not already one.
+   * @param userID The ID of the user to fetch posts for
+   * @returns An observable of the forum posts
+   */
   getForumPostsByUser(userID: string): Observable<Post[]> {
     return this.afs
       .collection('forum', (ref) => ref.where('author', '==', userID))
       .get()
       .pipe(map((snaps) => convertSnapsToType<Post>(snaps)));
   }
+  /**
+   * @description Fetches the forum posts liked by a specific user from Firestore. It retrieves the document from the user's likes collection and maps the likedPostIds field to an array of strings.
+   * @param userId The ID of the user to fetch liked posts for
+   * @returns An observable of the liked post IDs
+   */
   getUserLikedPosts(userId: string | null): Observable<string[]> {
     if (!userId) return of([]);
     return this.afs
@@ -82,6 +118,12 @@ export class ForumService {
       .valueChanges()
       .pipe(map((doc) => doc?.likedPostIds ?? []));
   }
+  /**
+   * @description Toggles the like status of a post for a specific user. It uses a Firestore transaction to atomically update the user's likes and the post's like count.
+   * @param postId The ID of the post to toggle
+   * @param userId The ID of the user to toggle the like for
+   * @returns An observable of the new like status (true if liked, false if unliked)
+   */
   toggleLike(postId: string, userId: string): Observable<boolean> {
     const likesRef = this.afs.firestore.doc(`users/${userId}/utils/likes`);
     const postRef = this.afs.firestore.doc(`forum/${postId}`);
@@ -114,17 +156,23 @@ export class ForumService {
       })
     );
   }
-  //CREATE
-
+  /**
+   * @description Updates a forum post in Firestore. It uses the update method to apply the changes to the specified post ID.
+   * @param postID The ID of the post to update
+   * @param changes The changes to apply to the post
+   * @returns An observable of void
+   */
   updatePost(postID: string, changes: Partial<Post>): Observable<void> {
     // Use backticks, not a literal string
     const ref = this.afs.doc(`forum/${postID}`);
     return from(ref.update(changes));
   }
 
-  /**
-   * Atomically create a comment under forum/{postId}/comments/{commentId}
-   * then increment the post’s commentCount.
+  /** 
+   * @description Creates a new comment in Firestore under the specified post ID. It uses a transaction to atomically create the comment and update the post's comment count.
+   * @param partial The partial comment data to create
+   * @param postId The ID of the post to create the comment under
+   * @returns A promise that resolves when the transaction is complete
    */
   createCommentTransaction(
     partial: Omit<Comment, 'id' | 'createdAt' | 'updatedAt' | 'commentNumber'>,
@@ -179,14 +227,21 @@ export class ForumService {
       tx.update(postRef, { commentCount: prevCount + 1 });
     });
   }
-
+  /**
+   * @description Updates the linked pictures of a forum post in Firestore. It uses the update method to apply the changes to the specified post ID.
+   * @param postId The ID of the post to update
+   * @param urls The new linked picture URLs to set
+   * @returns An observable of void
+   */
   updateLinkedPictures(postId: string, urls: string[]) {
     return this.afs.doc(`forum/${postId}`).update({ linkedPictures: urls });
   }
   /**
-   * Create a new post at forum/{postId}, upload up to 10 images
-   * into Storage under forum/{postId}/, then update linkedPictures.
-   * Returns an Observable<Post> with all fields set.
+   * @description Creates a new forum post in Firestore with the specified draft data and linked images. It uses a transaction to atomically create the post and upload the images.
+   * @param draft The draft data for the post
+   * @param postId The ID of the post to create
+   * @param files The files to upload as linked images
+   * @returns An observable of the created post
    */
   createPostWithImages(
     draft: Partial<Post>,
@@ -241,7 +296,9 @@ export class ForumService {
     );
   }
   /**
-   * Run a Firestore query based on the given filters.
+   * @description Fetches the forum posts that match the specified filter options from Firestore. It orders the results by likeCount or createdAt based on the filter options.
+   * @param opts The filter options to apply
+   * @returns An observable of the filtered forum posts
    */
   getFilteredForumPosts(opts: PostFilterOptions): Observable<Post[]> {
     return this.afs
@@ -275,11 +332,20 @@ export class ForumService {
       .pipe(map((snaps) => convertSnapsToType<Post>(snaps)));
   }
 
-  //DELETE
+  /**
+   * @description Deletes a forum post from Firestore by its ID. It uses the delete method to remove the document.
+   * @param postId The ID of the post to delete
+   * @returns An observable of void
+   */
   deletePost(postId: string): Observable<void> {
     return from(this.afs.doc(`forum/${postId}`).delete());
   }
-
+  /**
+   * @description Deletes a comment from a forum post in Firestore. It uses a transaction to atomically delete the comment and update the post's comment count.
+   * @param postId The ID of the post to delete the comment from
+   * @param commentId The ID of the comment to delete
+   * @returns An observable of void
+   */
   deleteComment(postId: string, commentId: string) {
     const commentRef = this.afs.firestore.doc(
       `forum/${postId}/comments/${commentId}`
@@ -295,6 +361,12 @@ export class ForumService {
       })
     );
   }
+  /**
+   * @description Deletes a linked image from a forum post in Firestore. It uses the delete method to remove the image from storage and the update method to remove the URL from the post's linkedPictures array.
+   * @param postId The ID of the post to delete the image from
+   * @param imageUrl The URL of the image to delete
+   * @returns An observable of void
+   */
   deletePostImage(postId: string, imageUrl: string): Observable<void> {
     const ref = this.storage.refFromURL(imageUrl);
     return from(ref.delete()).pipe(
@@ -305,6 +377,12 @@ export class ForumService {
       )
     );
   }
+  /**
+   * @description Toggles the lock status of a forum post in Firestore. It uses the update method to set the isLocked field to the opposite of its current value.
+   * @param postID The ID of the post to toggle
+   * @param isLocked The current lock status of the post
+   * @returns An observable of void
+   */
   toggleLockPost(postID: string, isLocked: boolean): Observable<void> {
     return from(
       this.afs.doc(`forum/${postID}`).update({ isLocked: !isLocked })

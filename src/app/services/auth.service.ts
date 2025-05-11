@@ -26,12 +26,17 @@ export class AuthService {
       switchMap(user => of(user ?? null)) // Ensure undefined is replaced with null
     );
   }
+  /**
+   * @description This method checks if the user is an admin by checking the 'admin' claim in the user's ID token.
+   * @returns An observable of the user's admin status
+   */
   isAdmin$(): Observable<boolean> {
     return this.afAuth.authState.pipe(
       switchMap(u => u ? from(u.getIdTokenResult()) : of(null)),
       map(res => !!res?.claims['admin'])
     );
   }
+
   resetPassword(email: string): Observable<void> {
     return from(this.afAuth.sendPasswordResetEmail(email));
   }
@@ -123,11 +128,17 @@ export class AuthService {
   logout(): Observable<void> {
     return from(this.afAuth.signOut());
   }
-  // Get the current user from Firebase Auth
+  /**
+   * @returns An observable of the current user
+   * @description This method returns the current user from Firebase Auth. It uses the authState observable to get the user data.
+   */
   getCurrentUser(): Observable<any> {
     return this.afAuth.authState;
   }
-  // Get the current user ID from Firebase Auth
+  /** 
+   * @returns An observable of the current user's ID
+   * @description This method returns the current user's ID from Firebase Auth. It uses the authState observable to get the user data and returns the UID.
+  */
   getCurrentUserID(): Observable<string | null> {
     return this.afAuth.authState.pipe(
       switchMap((user) => {
@@ -139,7 +150,10 @@ export class AuthService {
       })
     );
   }
-  // Get the current user data from Firestore
+  /**
+   * @returns An observable of the current user's data
+   * @description This method returns the current user's data from Firestore. It uses the authState observable to get the user data and then fetches the user document from Firestore.
+   */
   getCurrentUserData(): Observable<User | null | undefined> {
     return this.user$.pipe(
       switchMap((user) => {

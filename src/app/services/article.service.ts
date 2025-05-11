@@ -24,12 +24,14 @@ export interface ArticleItem {
   providedIn: 'root',
 })
 export class ArticleService {
-  
   constructor(
     private afs: AngularFirestore,
     private storage: AngularFireStorage
   ) {}
-  /** Fetch all articles, newest first */
+  /**
+   * @returns An observable of the articles
+   * @description This method fetches the latest 50 articles from Firestore, ordered by createdAt in descending order. It maps the createdAt field to a Date object if it is not already one.
+  */
   getArticles(): Observable<ArticleItem[]> {
     return this.afs
       .collection<ArticleItem>('articles', (ref) =>
@@ -48,7 +50,11 @@ export class ArticleService {
         )
       );
   }
-  /** Fetch a single article by its Firestore ID */
+  /**
+   * @param id The ID of the article to fetch
+   * @returns An observable of the article item, or undefined if not found
+   * @description This method fetches a single article from Firestore by its ID. It maps the createdAt field to a Date object if it is not already one.
+   */
   getArticle(id: string): Observable<ArticleItem | undefined> {
     return this.afs
       .doc<ArticleItem>(`articles/${id}`)
@@ -68,11 +74,11 @@ export class ArticleService {
       );
   }
   /**
-   * Creates a new article:
-   *  1) writes empty doc with title & createdAt
-   *  2) uploads thumbnail
-   *  3) uploads each image block
-   *  4) updates doc with thumbnailURL and blocks[]
+   * @param title The title of the article
+   * @param thumbnail The thumbnail image file
+   * @param blocks The blocks of the article, which can be text or image
+   * @returns An observable that completes when the article is created
+   * @description This method creates a new article in Firestore. It first creates an empty document with the title and createdAt fields. Then, it uploads the thumbnail image and each image block, and finally updates the document with the thumbnail URL and blocks array.
    */
   createArticle(
     title: string,

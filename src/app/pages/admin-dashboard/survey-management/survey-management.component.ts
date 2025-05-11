@@ -56,16 +56,26 @@ export class SurveyManagementComponent implements OnInit {
   get questions(): FormArray {
     return this.surveyForm.get('questions') as FormArray;
   }
-
+  /**
+   * @description Add a new question to the form
+   */
   addQuestion() {
     this.questions.push(this.fb.control('', Validators.required));
   }
 
+  /**
+   * @description Remove a question from the form
+   * @param index The index of the question to remove
+   */
   removeQuestion(index: number) {
     if (this.questions.length > 1) {
       this.questions.removeAt(index);
     }
   }
+  /**
+   * @description Toggle the hidden state of a survey definition
+   * @param def The survey definition to toggle
+   */
   toggleHidden(def: SurveyDefinition) {
     if (def.isHidden) {
       this.surveySvc.unhideDefinition(def.id).subscribe();
@@ -73,6 +83,9 @@ export class SurveyManagementComponent implements OnInit {
       this.surveySvc.hideDefinition(def.id).subscribe();
     }
   }
+  /**
+   * @description Create a new survey definition
+   */
   createDefinition() {
     if (this.surveyForm.invalid) return;
     const { name, questions } = this.surveyForm.value;

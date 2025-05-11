@@ -39,7 +39,9 @@ export class EmailsComponent implements OnInit {
       body: ['', Validators.required]
     });
   }
-
+  /**
+   * @description Send email to all users
+   */
   send() {
     if (this.emailForm.invalid) return;
     const { subject, body } = this.emailForm.value;

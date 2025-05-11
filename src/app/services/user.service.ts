@@ -13,10 +13,12 @@ export class UserService {
     private storage: AngularFireStorage,
     private surveySvc: SurveyService
   ) {}
-  getAllUsers(): any {
-    return this.afs.collection('users').get;
-  }
-  /** All notifications for a user */
+  
+  /**
+   * @description Fetches all notifications for a user from Firestore, ordered by date in descending order.
+   * @param uid The user ID
+   * @returns An observable of the user's notifications
+  */
   getNotifications(uid: string): Observable<Notification[]> {
     return this.afs
       .collection<Notification>(`users/${uid}/notifications`, (ref) =>
@@ -34,7 +36,11 @@ export class UserService {
       );
   }
 
-  /** Combine visible surveys & user’s answers */
+  /**
+   * @description Fetches all survey definitions that are not hidden and the user has not answered yet.
+   * @param uid The user ID
+   * @returns An observable of the survey definitions that the user has not completed
+  */
   getIncompleteSurveys(uid: string) {
     return this.surveySvc
       .getVisibleDefinitions()
@@ -50,23 +56,40 @@ export class UserService {
         )
       );
   }
-  /** Marks a single notification as read */
+  /**
+   * @description Marks a notification as read by updating the 'read' field to true in Firestore.
+   * @param uid The user ID
+   * @param notificationId The notification ID
+   * @returns A promise that resolves when the update is complete
+  */
   markAsRead(uid: string, notificationId: string): Promise<void> {
     return this.afs
       .doc(`users/${uid}/notifications/${notificationId}`)
       .update({ read: true });
   }
-  /** Default “blank” profile picture URL */
+  /** 
+   * @description Fetches the default profile picture URL from Firebase Storage.
+   * @returns An observable of the default profile picture URL
+  */
   getDefaultPicUrl(): Observable<string> {
     return this.storage.ref('shared/profile_default.png').getDownloadURL();
   }
 
-  /** Real-time stream of a user’s document */
+  /** 
+   * @description Fetches the user data from Firestore by user ID.
+   * @param uid The user ID
+   * @returns An observable of the user data
+  */
   userData$(uid: string): Observable<any> {
     return this.afs.doc(`users/${uid}`).valueChanges();
   }
 
-  /** Upload a new profile pic and update the user doc */
+  /** 
+   * @description Uploads a profile picture to Firebase Storage and updates the user's document with the new URL.
+   * @param uid The user ID
+   * @param file The image file to upload
+   * @returns An observable of the download URL
+   */
   updateProfilePic(uid: string, file: File): Observable<string> {
     const ext = file.type === 'image/png' ? 'png' : 'jpg';
     const path = `profiles/${uid}/profilePic.${ext}`;

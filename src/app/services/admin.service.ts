@@ -21,8 +21,12 @@ export interface Article {
 })
 export class AdminService {
   constructor(private afs: AngularFirestore) {}
-
-  // Bulk Email via Firestore 'mail' collection (Trigger Email)
+  /**
+   * @description This method retreieves all users from the Firestore database. Then it writes a document to the 'mail' collection for each user with their email address and the message to be sent.
+   * @param subject The subject of the email
+   * @param html The HTML content of the email
+   * @returns An observable that emits when the batch commit is complete
+   */
   sendEmailToAll(subject: string, html: string): Observable<void> {
     return this.afs
       .collection('users')
@@ -48,7 +52,10 @@ export class AdminService {
         })
       );
   }
-
+  /**
+   * @description This method retrieves all users from the Firestore database and returns them as an observable array of User objects.
+   * @returns An observable array of User objects
+   */
   searchUsers(prefix: string): Observable<User[]> {
     return this.afs
       .collection<User>('users', (ref) => {
@@ -61,8 +68,12 @@ export class AdminService {
       })
       .valueChanges({ idField: 'uid' });
   }
-
-  /** Toggle a user’s disabled flag on their own doc */
+  /**
+   * 
+   * @param uid The UID of the user that is to be updated
+   * @param disabled The disabled status of the user
+   * @returns An observable of void
+   */
   setUserDisabled(uid: string, disabled: boolean): Observable<void> {
     return from(this.afs.doc(`users/${uid}`).update({ disabled }));
   }

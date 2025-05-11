@@ -91,19 +91,27 @@ export class CommodityDetailComponent implements OnInit, OnDestroy, AfterViewIni
       this.drawAll();
     }
   }
+  /**
+   * 
+   * @returns void
+   * @description Draws the history and region charts
+   */
   private drawAll() {
     if (!this.commodity || !this.historyCtx || !this.regionCtx) return;    
     this.drawHistoryChart();
     this.drawRegionScatter();
   }
-
+  /**
+   * @returns void
+   * @description Draws the history chart
+   */
   private drawHistoryChart() {
     const days = this.daysControl.value ?? 30;
     const hist = this.commodity!.historical.slice(-days);
     const labels = hist.map((h) => h.date.toLocaleDateString());
     const prices = hist.map((h) => h.price);
     const volumes = hist.map((h) => h.volume);
-
+     
     this.historyChart?.destroy();
     this.historyChart = new Chart(
       this.historyCtx.nativeElement.getContext('2d')!,
@@ -143,7 +151,10 @@ export class CommodityDetailComponent implements OnInit, OnDestroy, AfterViewIni
       }
     );
   }
-
+  /**
+   * @returns void
+   * @description Draws the region scatter chart
+   */
   private drawRegionScatter() {
     const regions = Object.entries(this.commodity!.regionalData);
     const data = regions.map(([region, val]) => ({

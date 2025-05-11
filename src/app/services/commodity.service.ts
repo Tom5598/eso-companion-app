@@ -12,14 +12,21 @@ import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
 export class CommodityService {
   constructor(private afs: AngularFirestore, private analytics: AngularFireAnalytics) { }
 
-  // Master list of names for autocomplete
+  /**
+   * @description Retrieves the list of commodity names from Firestore.
+   * @returns An observable of the CommodityNames
+   */
   getCommodityNames(): Observable<CommodityNames[]> {
     return this.afs
       .doc<{ commodityNames: CommodityNames[] }>('utils/misc')
       .valueChanges()
       .pipe(map((doc) => doc?.commodityNames ?? []));
   }
-
+  /**
+   * @description Fetches commodities from Firestore based on the provided filters. It also converts Firestore Timestamps to JS Date objects.
+   * @param filters The filters to apply to the query
+   * @returns An observable of the filtered commodities
+   */
   queryCommodities(filters: CommodityFilter): Observable<Commodity[]> {
     return this.afs
       .collection<Commodity>('commodities', (ref) => {
@@ -71,6 +78,11 @@ export class CommodityService {
         )
       );
   }
+  /**
+   * @description Fetches a single commodity by name from Firestore. It also logs the event to Firebase Analytics.
+   * @param name The name of the commodity
+   * @returns An observable of the commodity, or undefined if not found
+   */
   getByName(name: string): Observable<Commodity | undefined> {
     this.analytics.logEvent('select_item', { item_id: name });
     return this.afs

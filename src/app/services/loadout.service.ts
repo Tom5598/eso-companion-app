@@ -61,7 +61,10 @@ export class LoadoutService {
         )
       );
   }
-
+  /**
+   * @description This method fetches all items from Firestore. It retrieves the itemList from the 'utils/items' document and maps each raw item to an observable of Item with actual URLs for previewPicture and model.
+   * @returns An observable of Item[]
+   */
   getAllItems(): Observable<Item[]> {
     return this.afs
       .doc<{ itemList: any[] }>('utils/items')
@@ -94,7 +97,7 @@ export class LoadoutService {
         })  
       );
   }
-
+  
   setItem<K extends keyof Loadout>(slot: K, url: string) {
     const current = this.subject.value;
     this.subject.next({ ...current, [slot]: url });

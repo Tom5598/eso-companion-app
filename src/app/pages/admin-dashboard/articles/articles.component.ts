@@ -54,7 +54,9 @@ export class ArticlesComponent implements OnInit {
   }
 
   get blocks() { return this.form.get('blocks') as FormArray; }
-
+  /**
+   * @description Add a new Text block to the form
+   */
   addTextBlock() {
     this.blocks.push(this.fb.group({
       type: ['text'],
@@ -63,7 +65,9 @@ export class ArticlesComponent implements OnInit {
     }));
     this.previewBlocks.push(null);
   }
-
+/**
+   * @description Add a new Image block to the form
+   */
   addImageBlock() {
     this.blocks.push(this.fb.group({
       type: ['image'],
@@ -72,12 +76,20 @@ export class ArticlesComponent implements OnInit {
     }));
     this.previewBlocks.push(null);
   }
-
+  /**
+   * @param i index of the block to remove
+   * @description Remove a block from the form
+   */
   removeBlock(i: number) {
     this.blocks.removeAt(i);
     this.previewBlocks.splice(i,1);
   }
-
+  /**
+   * @param ev event from the file input
+   * @description Handle thumbnail file selection
+   * @returns void
+   * 
+   */
   onThumbnailSelected(ev: Event) {
     const file = (ev.target as HTMLInputElement).files?.[0];
     if (!file) return;
@@ -97,7 +109,12 @@ export class ArticlesComponent implements OnInit {
     };
     img.src = url;
   }
-
+  /**
+   * @param ev event from the file input
+   * @param idx index of the block
+   * @description Handle block file selection
+   * @returns void
+   */
   onBlockFileSelected(ev: Event, idx: number) {
     const file = (ev.target as HTMLInputElement).files?.[0];
     if (!file) return;
@@ -117,7 +134,10 @@ export class ArticlesComponent implements OnInit {
     };
     img.src = url;
   }
-
+  /**
+   * @description Submit the form
+   * @returns void
+   */
   submit() {
     if (this.form.invalid) {
       this.snack.open('Please complete title, thumbnail, and all blocks','OK',{duration:2000});
